@@ -65,7 +65,7 @@ class AppConstants {
     ),
   );
 
-  // Dimensions
+  // DimensionsA
   static const double imageHeight = 200;
   static const double buttonHorizontalPadding = 30.0;
   static const double buttonVerticalPadding = 15.0;
