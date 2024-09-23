@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/utils/constants.dart';
+import 'package:myapp/utils/my_buttons.dart';
+import 'package:myapp/utils/onboarding_card.dart';
 import 'dart:ui';
 
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -22,7 +25,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             // Background image with a darker overlay
             ColorFiltered(
               colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.1), // Darken the image
+                Colors.black.withOpacity(0.5), // Darken the image
                 BlendMode.darken,
               ),
               child: Image.asset(
@@ -48,15 +51,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   Text(
                     "Welcome",
                     style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontFamily: 'Product Sans Regular',
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w400),
                   ),
                   Text(
                     "Skip",
                     style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontFamily: 'Product Sans Regular',
                         fontSize: 16,
                         fontWeight: FontWeight.w400),
@@ -64,23 +67,51 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 50,
-            ),
             // A text with the name ASPPEG REPORT APP goes here
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 100),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "ASPPEG REPORT APP",
+                    style: AppConstants.titleTextStyle
+                        .copyWith(fontSize: 23, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+
+            const Center(
+              child: OnboadingCards(
+                imagePath: "assets/images/smartphone.png",
+                shortDescription: "Crop Disease \nDetection \nin Snigle Click ",
+              ),
+            ),
 
             // a container goes inthe middle with and Image of a Phone  and some text
 
             Container(
-              alignment: const Alignment(0, 0),
+              alignment: const Alignment(0, 0.6),
               child: SmoothPageIndicator(
                   controller: _controller, // PageController
                   count: 3,
                   effect: const WormEffect(), // your preferred effect
                   onDotClicked: (index) {}),
+            ),
+            const Positioned(
+              bottom: 8,
+              left: 30,
+              right: 30,
+              child: Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween, // Use spaceBetween
+                children: [
+                  MyButton(text: "Login"),
+                  MyButton(text: "Next"),
+                ],
+              ),
             )
-
-            // in the container after the image we have a text with Crop Disease in Single Click
 
             //  a button for login and a button for next
             // Foreground content
