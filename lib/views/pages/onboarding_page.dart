@@ -15,6 +15,7 @@ class OnboardingPage extends StatefulWidget {
 
 class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _controller = PageController();
+  final int pageCount = 3; // Number of intro cards
 
   @override
   Widget build(BuildContext context) {
@@ -82,39 +83,63 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
 
-            const Center(
-              child: OnboadingCards(
-                imagePath: "assets/images/smartphone.png",
-                shortDescription: "Crop Disease \nDetection \nin Snigle Click ",
+            // PageView for only the cards with a controlled width
+            Center(
+              child: SizedBox(
+                height: 300, // Set appropriate height for the cards
+                width: MediaQuery.of(context).size.width *
+                    0.7, // Set width to 80% of the screen width
+                child: PageView(
+                  controller: _controller,
+                  children: const [
+                    OnboadingCards(
+                      imagePath: "assets/images/smartphone.png",
+                      shortDescription:
+                          "Crop Disease \nDetection \nin Single Click ",
+                    ),
+                    OnboadingCards(
+                      imagePath: "assets/images/report.png",
+                      shortDescription: "Detailed \nAnalysis \nFor Experts",
+                    ),
+                    OnboadingCards(
+                      imagePath: "assets/images/calculator.png",
+                      shortDescription: "Generate \nReports \nEffortlessly",
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            // a container goes inthe middle with and Image of a Phone  and some text
-
+            // Page indicator for the PageView
             Container(
-              alignment: const Alignment(0, 0.6),
+              alignment: const Alignment(0, 0.7),
               child: SmoothPageIndicator(
-                  controller: _controller, // PageController
-                  count: 3,
-                  effect: const WormEffect(), // your preferred effect
-                  onDotClicked: (index) {}),
+                controller: _controller, // PageController
+                count: pageCount, // Number of pages (3)
+                effect: const WormEffect(), // Smooth indicator effect
+                onDotClicked: (index) {
+                  _controller.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+              ),
             ),
+
+            // Buttons positioned at the bottom
             const Positioned(
               bottom: 8,
               left: 30,
-              right: 30,
+              right: 30,  
               child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // Use spaceBetween
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   MyButton(text: "Login"),
                   MyButton(text: "Next"),
                 ],
               ),
-            )
-
-            //  a button for login and a button for next
-            // Foreground content
+            ),
           ],
         ),
       ),
