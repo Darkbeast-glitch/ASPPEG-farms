@@ -8,6 +8,7 @@
     pkgs.nodePackages.firebase-tools
     pkgs.jdk17
     pkgs.unzip
+    pkgs.sdkmanager
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -59,6 +60,7 @@
           command = ["flutter" "run" "--machine" "-d" "android" "-d" "localhost:5555"];
           manager = "flutter";
         };
+        
       };
     };
   };
