@@ -15,7 +15,18 @@ class OnboardingPage extends StatefulWidget {
 
 class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _controller = PageController();
-  final int pageCount = 3; // Number of intro cards
+  final int pageCount = 4; // Number of intro cards
+  int currentPage = 0; // Track current page
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      setState(() {
+        currentPage = _controller.page!.round();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +99,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: SizedBox(
                 height: 300, // Set appropriate height for the cards
                 width: MediaQuery.of(context).size.width *
-                    0.7, // Set width to 80% of the screen width
+                    0.65, // Set width to 65% of the screen width
                 child: PageView(
                   controller: _controller,
                   children: const [
@@ -100,6 +111,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     OnboadingCards(
                       imagePath: "assets/images/report.png",
                       shortDescription: "Detailed \nAnalysis \nFor Experts",
+                    ),
+                    OnboadingCards(
+                      imagePath: "assets/images/Insect.png",
+                      shortDescription: "Monitor your\nPest",
                     ),
                     OnboadingCards(
                       imagePath: "assets/images/calculator.png",
@@ -115,7 +130,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               alignment: const Alignment(0, 0.7),
               child: SmoothPageIndicator(
                 controller: _controller, // PageController
-                count: pageCount, // Number of pages (3)
+                count: pageCount, // Number of pages (4)
                 effect: const WormEffect(), // Smooth indicator effect
                 onDotClicked: (index) {
                   _controller.animateToPage(
@@ -128,15 +143,30 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
 
             // Buttons positioned at the bottom
-            const Positioned(
+            Positioned(
               bottom: 8,
-              left: 30,
-              right: 30,  
+              left: 40,
+              right: 40,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  MyButton(text: "Login"),
-                  MyButton(text: "Next"),
+                  const MyButton(text: "Login"),
+
+                  // Updated Next/Get Started Button Logic
+                  MyButton(
+                    text: currentPage == pageCount - 1 ? "Get started" : "Next",
+                    onTap: () {
+                      if (currentPage < pageCount - 1) {
+                        _controller.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      } else {
+                        // Handle the 'Get started' action here
+                        // Example: Navigator.pushReplacementNamed(context, '/home');
+                      }
+                    },
+                  ),
                 ],
               ),
             ),

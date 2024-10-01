@@ -72,7 +72,7 @@ class GetStartedPage extends StatelessWidget {
                   MyButton(
                     text: "Get Started",
                     onTap: () {
-                      Navigator.pushNamed(context, '/home');
+                      Navigator.pushNamed(context, '/onboarding');
                     },
                   )
                 ],
