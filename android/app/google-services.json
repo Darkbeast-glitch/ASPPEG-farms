@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1041739958571",
+    "project_id": "asspeg-e4504",
+    "storage_bucket": "asspeg-e4504.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041739958571:android:efef5e630ac520c6e81d6e",
+        "android_client_info": {
+          "package_name": "com.asppeg.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX85bP1OfP5g4PpBa4xJnJznUn4n4u6f4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041739958571:android:0a4b8a929d740d5ee81d6e",
+        "android_client_info": {
+          "package_name": "com.asspeg.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX85bP1OfP5g4PpBa4xJnJznUn4n4u6f4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
