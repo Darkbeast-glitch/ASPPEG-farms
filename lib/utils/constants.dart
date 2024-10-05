@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppConstants {
   // Colors
-  static const Color primaryColor = Color.fromARGB(255, 254, 251, 51);
+  static const Color primaryColor = Colors.green;
   static const Color secondaryColor = Color.fromARGB(255, 27, 63, 161);
-  static const Color backgroundColor = Colors.black;
+  static const Color backgroundColor = Color.fromARGB(255, 33, 29, 29);
   static const Color textColor = Colors.black;
 
   // Fonts

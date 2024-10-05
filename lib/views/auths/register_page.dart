@@ -14,6 +14,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _fullnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -77,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     MyTextForm(
                         hintText: " Fullname",
                         prefix: const Icon(Icons.person),
-                        controller: _emailController,
+                        controller: _fullnameController,
                         obsecureText: false),
                     const Gap(10),
 
@@ -100,7 +101,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     MyTextForm(
                         hintText: "Confirm Password",
                         prefix: const Icon(Icons.lock),
-                        controller: _passwordController,
+                        controller: _confirmPasswordController,
                         obsecureText: true),
                     const Gap(10),
 

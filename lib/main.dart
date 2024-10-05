@@ -27,9 +27,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'APPEG ',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: ThemeData( 
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        
       ),
       navigatorKey: navigatorKey,
       initialRoute: '/', // Set the initial route
