@@ -1,35 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/my_buttons.dart';
 import 'package:myapp/utils/onboarding_card.dart';
+import 'package:myapp/providers/onboarding_provider.dart'; // Import the provider
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared preferences
 import 'dart:ui';
 
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerWidget {
   const OnboardingPage({super.key});
 
-  @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
-}
-
-class _OnboardingPageState extends State<OnboardingPage> {
-  final PageController _controller = PageController();
-  final int pageCount = 4; // Number of intro cards
-  int currentPage = 0; // Track current page
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(() {
-      setState(() {
-        currentPage = _controller.page!.round();
-      });
-    });
+  // Method to mark onboarding as completed
+  Future<void> _completeOnboarding(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasViewedOnboarding', true); // Save onboarding status
+    Navigator.pushReplacementNamed(context, '/auth'); // Navigate to login/auth page
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Initialize the PageController within the build method
+    final currentPage = ref.watch(currentPageProvider);
+    final controller = PageController(initialPage: currentPage);
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -47,6 +41,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 width: double.infinity,
               ),
             ),
+
             // Blur effect
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), // Subtle blur
@@ -54,7 +49,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 color: Colors.black.withOpacity(0), // Transparent overlay
               ),
             ),
-            // a row of two text called Welcome and Skip
+
+            // Welcome and Skip row
             const Padding(
               padding: EdgeInsets.all(15.0),
               child: Row(
@@ -63,23 +59,26 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   Text(
                     "Welcome",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Product Sans Regular',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
+                      color: Colors.white,
+                      fontFamily: 'Product Sans Regular',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                   Text(
                     "Skip",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Product Sans Regular',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
+                      color: Colors.white,
+                      fontFamily: 'Product Sans Regular',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
                   )
                 ],
               ),
             ),
-            // A text with the name ASPPEG REPORT APP goes here
+
+            // App title text
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 100),
               child: Row(
@@ -87,26 +86,31 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 children: [
                   Text(
                     "ASPPEG REPORT APP",
-                    style: AppConstants.titleTextStyle
-                        .copyWith(fontSize: 23, color: Colors.white),
+                    style: AppConstants.titleTextStyle.copyWith(
+                      fontSize: 23,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // PageView for only the cards with a controlled width
+            // PageView for onboarding cards
             Center(
               child: SizedBox(
                 height: 300, // Set appropriate height for the cards
                 width: MediaQuery.of(context).size.width *
                     0.65, // Set width to 65% of the screen width
                 child: PageView(
-                  controller: _controller,
+                  controller: controller,
+                  onPageChanged: (index) {
+                    ref.read(currentPageProvider.notifier).state = index;
+                  },
                   children: const [
                     OnboadingCards(
                       imagePath: "assets/images/smartphone.png",
                       shortDescription:
-                          "Crop Disease \nDetection \nin Single Click ",
+                          "Crop Disease \nDetection \nin Single Click",
                     ),
                     OnboadingCards(
                       imagePath: "assets/images/report.png",
@@ -126,14 +130,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
 
             // Page indicator for the PageView
-            Container(
+            Align(
               alignment: const Alignment(0, 0.7),
               child: SmoothPageIndicator(
-                controller: _controller, // PageController
-                count: pageCount, // Number of pages (4)
+                controller: controller, // PageController
+                count: pageCount, // Number of pages
                 effect: const WormEffect(), // Smooth indicator effect
                 onDotClicked: (index) {
-                  _controller.animateToPage(
+                  controller.animateToPage(
                     index,
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
@@ -157,13 +161,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     text: currentPage == pageCount - 1 ? "Get started" : "Next",
                     onTap: () {
                       if (currentPage < pageCount - 1) {
-                        _controller.nextPage(
+                        controller.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
                       } else {
-                        // Handle the 'Get started' action here
-                        // Example: Navigator.pushReplacementNamed(context, '/home');
+                        // Call method to complete onboarding and navigate to auth page
+                        _completeOnboarding(context);
                       }
                     },
                   ),

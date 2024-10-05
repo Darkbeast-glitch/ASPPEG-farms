@@ -1,10 +1,21 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:myapp/firebase_options.dart';
 import 'package:myapp/routes/routes.dart';
-import 'package:myapp/views/auths/login_page.dart';
-// import 'package:myapp/views/pages/onboarding_page.dart';
 
-void main() {
-  runApp(const MyApp());
+final navigatorKey = GlobalKey<NavigatorState>();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,11 +27,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'APPEG ',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: ThemeData( 
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        
       ),
-      home: const LoginPage(),
+      navigatorKey: navigatorKey,
       initialRoute: '/', // Set the initial route
       routes: Routes.getRoutes(), // Use the routes from routes.dart
     );
