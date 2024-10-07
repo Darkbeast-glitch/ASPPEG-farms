@@ -18,8 +18,8 @@ class AuthService {
 
   get currentUser => auth.currentUser;
 
-// sign in with google function
-  void signInWithGoogle() async {
+  // Sign in with Google function
+  Future<void> signInWithGoogle() async {
     final user = await googleSignIn.signIn();
     final googleAuth = await user!.authentication;
     final credential = GoogleAuthProvider.credential(
@@ -29,7 +29,7 @@ class AuthService {
     await auth.signInWithCredential(credential);
   }
 
-//  sign in with email and password method
+  // Sign in with email and password method
   Future<void> signInWithEmailAndPassword(
       String email, String password, BuildContext context) async {
     try {
@@ -58,16 +58,12 @@ class AuthService {
     }
   }
 
-  // method for signout
-
+  // Sign out method
   Future<void> signOut() async {
     await auth.signOut();
   }
 
-  // void signInWithEmail( email, password ) async {
-  //   final user = await auth.s
-
-  // method to sign up users
+  // Method to sign up users
   Future<void> signUpWithEmailAndPassword(
       String email, String password, BuildContext context) async {
     try {
@@ -89,7 +85,6 @@ class AuthService {
       Navigator.pushReplacementNamed(context, '/getStarted');
 
       // Show success message
-      //
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.green,
@@ -116,5 +111,21 @@ class AuthService {
     }
   }
 
-  // }
+  // Method to get Firebase ID Token for the current user
+  Future<String?> getIdToken() async {
+    try {
+      final user = auth.currentUser;
+      if (user != null) {
+        String? idToken = await user.getIdToken();
+        print('Firebase ID Token: $idToken');
+        return idToken;
+      } else {
+        print('No user is currently signed in.');
+        return null;
+      }
+    } catch (e) {
+      print('Error getting Firebase ID Token: $e');
+      return null;
+    }
+  }
 }
