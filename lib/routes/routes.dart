@@ -18,7 +18,7 @@ class Routes {
       '/login': (context) => const LoginPage(),
       '/register': (context) => const RegisterPage(),
       '/profile': (context) => ProfilePage(),
-      '/newBatch': (context) => const NewBatchPage(),
+      '/newBatch': (context) => const NewBatchScreen(),
       '/existBatches': (context) => BatchesPage(),
       '/arrivalData': (context) => const ArrivalDataPage(),
 

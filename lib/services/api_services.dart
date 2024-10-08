@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/auth_services.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
-  final authService = ref.read(authSerivceProvider);
+  final authService = ref.read(authSerivceProvider); // Ensure correct spelling
   return ApiService(authService);
 });
 
 class ApiService {
   final AuthService authService;
   static const String baseUrl =
-      'https://8cca-102-211-52-246.ngrok-free.app/'; // Use your Ngrok URL
+      'https://9639-102-176-94-103.ngrok-free.app'; // Use your Ngrok URL
 
   ApiService(this.authService);
 
@@ -24,19 +24,28 @@ class ApiService {
     }
 
     final url = Uri.parse('$baseUrl/batch/add_batch');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $firebaseToken',
-      },
-      body: jsonEncode({'name': name}),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode({
+          'name': name,
+          'created_at':
+              DateTime.now().toIso8601String(), // Added the created_at field
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      print('Batch created successfully: ${response.body}');
-    } else {
-      print('Failed to create batch: ${response.statusCode} ${response.body}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Batch created successfully: ${response.body}');
+      } else {
+        print(
+            'Failed to create batch. Status code: ${response.statusCode}, Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error during batch creation: $e');
     }
   }
 
@@ -49,18 +58,23 @@ class ApiService {
     }
 
     final url = Uri.parse('$baseUrl/batch/get_batches');
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $firebaseToken',
-      },
-    );
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      print('Batches fetched successfully: ${response.body}');
-    } else {
-      print('Failed to fetch batches: ${response.statusCode} ${response.body}');
+      if (response.statusCode == 200) {
+        print('Batches fetched successfully: ${response.body}');
+      } else {
+        print(
+            'Failed to fetch batches. Status code: ${response.statusCode}, Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error during fetching batches: $e');
     }
   }
 }

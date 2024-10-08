@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 class MediumButtons extends StatelessWidget {
-  final Icon icon;
+  final Icon? icon; // Make icon nullable
   final String text;
   final Color color;
   final void Function()? onTap;
@@ -11,7 +11,7 @@ class MediumButtons extends StatelessWidget {
     super.key,
     required this.text,
     this.onTap,
-    required this.icon,
+    this.icon, // Icon is now optional
     required this.color,
   });
 
@@ -23,23 +23,16 @@ class MediumButtons extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.4,
         height: 50,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        decoration:
-            BoxDecoration(borderRadius: BorderRadius.circular(100), color: color
-                // boxShadow: [
-                //   BoxShadow(
-                //     color: Colors.grey.withOpacity(0.3),
-                //     spreadRadius: 1,
-                //     blurRadius: 3,
-                //     offset: const Offset(0, 3), // changes position of shadow
-                //   ),
-                // ],
-                ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          color: color,
+        ),
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              icon,
-              const Gap(10),
+              if (icon != null) icon!, // Only show the icon if it's provided
+              if (icon != null) const Gap(10), // Add gap if icon is present
               Text(
                 text,
                 style: const TextStyle(
