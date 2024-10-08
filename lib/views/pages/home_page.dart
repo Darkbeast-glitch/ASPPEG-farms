@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:myapp/providers/medium_buttons.dart';
 import 'package:myapp/utils/batch_button.dart';
 import 'package:myapp/utils/overview_card.dart';
 import 'package:myapp/utils/upcoming_card.dart';
+import 'package:myapp/services/api_services.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _selectedIndex = 0;
+  int _activeBatches = 0; // State variable to store active batches count
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActiveBatchCount(); // Fetch the active batch count when the page loads
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -22,11 +30,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _fetchActiveBatchCount() async {
+    final apiService = ref.read(apiServiceProvider);
+    int count = await apiService.getActiveBatchCount();
+    setState(() {
+      _activeBatches = count;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Temporary hardcoded values
     const userName = 'Julius';
-    const activeBatches = 0;
     const plantsInGreenhouse = 0;
     const cutsDue = 0;
 
@@ -157,35 +172,33 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 8),
             Container(
-              // White background for the container
-              padding: const EdgeInsets.all(
-                  8), // Optional padding inside the container
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                   color: const Color(0XFF494E4B),
                   borderRadius: BorderRadius.circular(10)),
-              child: const Column(
+              child: Column(
                 children: [
-                  // Overview Cards
+                  // Overview Cards with dynamic data
                   OverviewCard(
                     icon: Icons.batch_prediction,
                     label: 'Active Batches',
-                    value: '$activeBatches',
+                    value: '$_activeBatches', // Display active batch count
                   ),
-                  Gap(5),
-                  OverviewCard(
+                  const Gap(5),
+                  const OverviewCard(
                     icon: Icons.grass,
                     label: 'Plants in Greenhouse',
                     value: '$plantsInGreenhouse',
                   ),
-                  Gap(5),
-
-                  OverviewCard(
+                  const Gap(5),
+                  const OverviewCard(
                     icon: Icons.warning,
-                    label: 'Cuts Due in 3 Days',
+                    label: 'Total Reproduction',
                     value: '$cutsDue',
                     iconColor: Colors.yellow,
                   ),
-                  SizedBox(height: 16), // Optional spacing after the last card
+                  const SizedBox(
+                      height: 16), // Optional spacing after the last card
                 ],
               ),
             ),
