@@ -89,7 +89,10 @@ class NewBatchPage extends ConsumerWidget {
 
                 const MediumButtons(
                   text: "Create Batch",
-                  icon: Icon(Icons.create),
+                  icon: Icon(
+                    Icons.add_circle_rounded,
+                    color: Colors.white,
+                  ),
                   color: Colors.green,
                 ),
               ],

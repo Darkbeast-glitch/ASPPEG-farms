@@ -193,19 +193,22 @@ class _HomePageState extends State<HomePage> {
             const Gap(15),
 
             // Report and Issue buttons
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 MediumButtons(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/arrivalData");
+                  },
                   text: "Report",
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.edit_document,
                     color: Colors.white,
                   ),
-                  color: Color(0xFF363836),
+                  color: const Color(0xFF363836),
                 ),
-                Gap(10),
-                MediumButtons(
+                const Gap(10),
+                const MediumButtons(
                     text: "Issue",
                     icon: Icon(
                       Icons.report_problem,

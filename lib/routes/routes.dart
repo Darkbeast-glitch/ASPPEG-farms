@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/views/auths/auth_gate.dart';
 import 'package:myapp/views/auths/login_page.dart';
 import 'package:myapp/views/auths/register_page.dart';
+import 'package:myapp/views/pages/arrival_data.dart';
 import 'package:myapp/views/pages/existing_batch_page.dart';
 import 'package:myapp/views/pages/get_started_page.dart';
 import 'package:myapp/views/pages/new_batch.dart';
@@ -18,8 +19,8 @@ class Routes {
       '/register': (context) => const RegisterPage(),
       '/profile': (context) => ProfilePage(),
       '/newBatch': (context) => const NewBatchPage(),
-      '/existBatches': (context) => const BatchesPage(),
-      
+      '/existBatches': (context) => BatchesPage(),
+      '/arrivalData': (context) => const ArrivalDataPage(),
 
       // Add other routes here
     };

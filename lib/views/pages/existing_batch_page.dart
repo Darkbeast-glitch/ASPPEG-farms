@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
-import 'package:myapp/utils/constants.dart'; // Assuming you have a constants file for colors and text styles
+import 'package:myapp/utils/constants.dart';
+import 'package:myapp/utils/my_textfield.dart'; // Assuming you have a constants file for colors and text styles
 
 class BatchesPage extends ConsumerWidget {
-  const BatchesPage({super.key});
-
+  BatchesPage({super.key});
+  final searchController = TextEditingController();
+  final obsecureText = false;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
@@ -14,27 +15,64 @@ class BatchesPage extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor:
               AppConstants.backgroundColor, // Use your own color here
-          title: const Text("View Your Batches"),
+          title: Text(
+            "View Your Batches",
+            style: AppConstants.titleTextStyle
+                .copyWith(color: Colors.white, fontSize: 17),
+          ),
           centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.menu),
+              icon: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
               onPressed: () {
                 // Open drawer or handle other functionality
               },
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.folder_open), text: "Active Batches"),
-              Tab(icon: Icon(Icons.check_circle), text: "Completed"),
-              Tab(icon: Icon(Icons.add_circle), text: "Add Batch"),
+              Tab(
+                icon: const Icon(
+                  Icons.dashboard_outlined,
+                  color: Colors.white,
+                  size: 25,
+                ),
+                child: Text("Active Batches",
+                    style: AppConstants.subtitleTextStyle
+                        .copyWith(color: Colors.white, fontSize: 13)),
+              ),
+              Tab(
+                icon: const Icon(
+                  Icons.check_circle,
+                  color: Colors.white,
+                  size: 25,
+                ),
+                child: Text("Completed",
+                    style: AppConstants.subtitleTextStyle
+                        .copyWith(color: Colors.white, fontSize: 13)),
+              ),
+              Tab(
+                icon: const Icon(
+                  Icons.add_circle,
+                  color: Colors.white,
+                  size: 25,
+                ),
+                child: Text("Add Batch",
+                    style: AppConstants.subtitleTextStyle
+                        .copyWith(color: Colors.white, fontSize: 13)),
+              ),
             ],
           ),
         ),
@@ -42,33 +80,41 @@ class BatchesPage extends ConsumerWidget {
         body: SafeArea(
           child: Column(
             children: [
-              // Search bar
+              // // Search bar
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.black),
-                      Gap(10),
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Search for batch name",
-                          ),
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                padding: const EdgeInsets.all(20),
+                child: MyTextForm(
+                    hintText: "Search for batch name",
+                    prefix: const Icon(Icons.search),
+                    controller: searchController,
+                    obsecureText: false),
               ),
+              // Padding(
+              //   padding: const EdgeInsets.all(16.0),
+              //   child: Container(
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              //     decoration: BoxDecoration(
+              //       color: Colors.grey[300],
+              //       borderRadius: BorderRadius.circular(30),
+              //     ),
+              //     child: const Row(
+              //       children: [
+              //         Icon(Icons.search, color: Colors.black),
+              //         Gap(10),
+              //         Expanded(
+              //           child: TextField(
+              //             decoration: InputDecoration(
+              //               border: InputBorder.none,
+              //               hintText: "Search for batch name",
+              //             ),
+              //             style: TextStyle(color: Colors.black),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
               // Tab Bar View
               Expanded(
                 child: TabBarView(
@@ -81,7 +127,7 @@ class BatchesPage extends ConsumerWidget {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Navigate to Add Batch page
+                          Navigator.pushNamed(context, "/newBatch");
                         },
                         child: const Text("Add New Batch"),
                       ),
@@ -141,7 +187,8 @@ class BatchesPage extends ConsumerWidget {
                   ),
                   title: Text(
                     batches[index]["name"]!,
-                    style: const TextStyle(color: Colors.white),
+                    style: AppConstants.subtitleTextStyle
+                        .copyWith(color: Colors.white, fontSize: 14),
                   ),
                   trailing: Text(
                     batches[index]["date"]!,
