@@ -77,4 +77,38 @@ class ApiService {
       print('Error during fetching batches: $e');
     }
   }
+
+  // function to getAtiveBatachesout
+  Future<int> getActiveBatchCount() async {
+    // Get the Firebase ID token from the AuthService
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return 0;
+    }
+
+    final url = Uri.parse('$baseUrl/batch/count_batches');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        int batchCount = int.parse(response.body);
+        print('Total number of active batches: $batchCount');
+        return batchCount;
+      } else {
+        print(
+            'Failed to fetch active batch count. Status code: ${response.statusCode}');
+        return 0;
+      }
+    } catch (e) {
+      print('Error during fetching active batch count: $e');
+      return 0;
+    }
+  }
 }
