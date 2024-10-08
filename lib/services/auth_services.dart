@@ -27,6 +27,9 @@ class AuthService {
       idToken: googleAuth.idToken,
     );
     await auth.signInWithCredential(credential);
+
+    // Print the Firebase ID token to the console
+    await printFirebaseToken();
   }
 
   // Sign in with email and password method
@@ -39,8 +42,10 @@ class AuthService {
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
       await auth.signInWithEmailAndPassword(email: email, password: password);
-      // ignore: use_build_context_synchronously
       Navigator.pop(context);
+
+      // Print the Firebase ID token to the console
+      await printFirebaseToken();
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       // Handle errors
@@ -55,6 +60,21 @@ class AuthService {
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that user.');
       }
+    }
+  }
+
+  // Method to get and print Firebase ID Token for the current user
+  Future<void> printFirebaseToken() async {
+    try {
+      final user = auth.currentUser;
+      if (user != null) {
+        String? idToken = await user.getIdToken();
+        print('Firebase ID Token: $idToken');
+      } else {
+        print('No user is currently signed in.');
+      }
+    } catch (e) {
+      print('Error getting Firebase ID Token: $e');
     }
   }
 
@@ -111,8 +131,7 @@ class AuthService {
     }
   }
 
-  // Method to get Firebase ID Token for the current user
-  Future<String?> getIdToken() async {
+   Future<String?> getIdToken() async {
     try {
       final user = auth.currentUser;
       if (user != null) {
@@ -129,3 +148,4 @@ class AuthService {
     }
   }
 }
+
