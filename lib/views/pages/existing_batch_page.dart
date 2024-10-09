@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/utils/constants.dart';
-import 'package:myapp/utils/my_textfield.dart'; // Assuming you have a constants file for colors and text styles
+import 'package:myapp/utils/my_textfield.dart';
+import 'package:myapp/services/api_services.dart';
 
 class BatchesPage extends ConsumerWidget {
   BatchesPage({super.key});
   final searchController = TextEditingController();
   final obsecureText = false;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
       length: 3, // 3 tabs: Active Batches, Completed, Add Batch
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor:
-              AppConstants.backgroundColor, // Use your own color here
+          backgroundColor: AppConstants.backgroundColor, // Use your own color here
           title: Text(
             "View Your Batches",
             style: AppConstants.titleTextStyle
@@ -80,7 +81,7 @@ class BatchesPage extends ConsumerWidget {
         body: SafeArea(
           child: Column(
             children: [
-              // // Search bar
+              // Search bar
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: MyTextForm(
@@ -89,32 +90,6 @@ class BatchesPage extends ConsumerWidget {
                     controller: searchController,
                     obsecureText: false),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(16.0),
-              //   child: Container(
-              //     padding:
-              //         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              //     decoration: BoxDecoration(
-              //       color: Colors.grey[300],
-              //       borderRadius: BorderRadius.circular(30),
-              //     ),
-              //     child: const Row(
-              //       children: [
-              //         Icon(Icons.search, color: Colors.black),
-              //         Gap(10),
-              //         Expanded(
-              //           child: TextField(
-              //             decoration: InputDecoration(
-              //               border: InputBorder.none,
-              //               hintText: "Search for batch name",
-              //             ),
-              //             style: TextStyle(color: Colors.black),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
               // Tab Bar View
               Expanded(
                 child: TabBarView(
@@ -165,41 +140,51 @@ class BatchesPage extends ConsumerWidget {
 
   // Helper function to build a batch list
   Widget _buildBatchList(BuildContext context, WidgetRef ref, String tab) {
-    final List<Map<String, String>> batches = [
-      {"name": "Cephas", "date": "January 1 2024"},
-      {"name": "Julius", "date": "January 1 2024"},
-      {"name": "Rhoda", "date": "January 1 2024"},
-    ];
+    // Fetching the list of batches from the API service using a FutureProvider
+    final batchListProvider = FutureProvider<List<Map<String, String>>>((ref) async {
+      final apiService = ref.read(apiServiceProvider);
+      final batches = await apiService.getBatches();
+      return batches.map((batch) {
+        return {
+          "name": batch.name,
+          "date": batch.createdAt.toString(),
+        };
+      }).toList();
+    });
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: batches.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Text(
-                    "${index + 1}.",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  title: Text(
-                    batches[index]["name"]!,
-                    style: AppConstants.subtitleTextStyle
-                        .copyWith(color: Colors.white, fontSize: 14),
-                  ),
-                  trailing: Text(
-                    batches[index]["date"]!,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+    return Consumer(
+  builder: (context, ref, child) {
+    final batchListAsyncValue = ref.watch(batchListProvider);
+
+    return batchListAsyncValue.when(
+      data: (batches) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: ListView.builder(
+          itemCount: batches.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: Text(
+                "${index + 1}.",
+                style: const TextStyle(color: Colors.white),
+              ),
+              title: Text(
+                batches[index]["name"]!,
+                style: AppConstants.subtitleTextStyle
+                    .copyWith(color: Colors.white, fontSize: 14),
+              ),
+              trailing: Text(
+                batches[index]["date"]!,
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
+          },
+        ),
       ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('Error: $error')),
     );
+  },
+);
+
   }
 }
