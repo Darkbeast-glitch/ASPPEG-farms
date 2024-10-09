@@ -28,6 +28,21 @@ class _HomePageState extends ConsumerState<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
+    if (_selectedIndex != index) {
+      Navigator.pop(context);
+    }
+
+    // using switch case to navigate to different pages
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        Navigator.pushNamed(context, "/existBatches");
+        break;
+      case 2:
+        Navigator.pushNamed(context, "/settings");
+        break;
+    }
   }
 
   Future<void> _fetchActiveBatchCount() async {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:myapp/models/batch_models.dart';
 import 'package:myapp/services/auth_services.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -49,34 +50,36 @@ class ApiService {
     }
   }
 
-  Future<void> getBatches() async {
-    // Get the Firebase ID token from the AuthService
-    String? firebaseToken = await authService.getIdToken();
-    if (firebaseToken == null) {
-      print('Failed to retrieve Firebase token.');
-      return;
-    }
-
-    final url = Uri.parse('$baseUrl/batch/get_batches');
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $firebaseToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        print('Batches fetched successfully: ${response.body}');
-      } else {
-        print(
-            'Failed to fetch batches. Status code: ${response.statusCode}, Response: ${response.body}');
-      }
-    } catch (e) {
-      print('Error during fetching batches: $e');
-    }
+Future<List<Batch>> getBatches() async {
+  String? firebaseToken = await authService.getIdToken();
+  if (firebaseToken == null) {
+    print('Failed to retrieve Firebase token.');
+    return [];
   }
+
+  final url = Uri.parse('$baseUrl/batch/get_batches');
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $firebaseToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> batchData = jsonDecode(response.body);
+      return batchData.map((data) => Batch.fromJson(data)).toList();
+    } else {
+      print('Failed to fetch batches. Status code: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Error during fetching batches: $e');
+    return [];
+  }
+}
+
 
   // function to getAtiveBatachesout
   Future<int> getActiveBatchCount() async {
