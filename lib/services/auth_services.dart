@@ -2,19 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:myapp/services/api_services.dart';
 
 final authSerivceProvider = Provider<AuthService>((ref) {
-  return AuthService(auth: FirebaseAuth.instance, googleSignIn: GoogleSignIn());
+  return AuthService(
+      auth: FirebaseAuth.instance, googleSignIn: GoogleSignIn(), ref: ref);
 });
 
 class AuthService {
   FirebaseAuth auth;
   GoogleSignIn googleSignIn;
+  final Ref ref;
 
-  AuthService({
-    required this.auth,
-    required this.googleSignIn,
-  });
+  AuthService(
+      {required this.auth, required this.googleSignIn, required this.ref});
 
   get currentUser => auth.currentUser;
 
@@ -85,7 +86,7 @@ class AuthService {
 
   // Method to sign up users
   Future<void> signUpWithEmailAndPassword(
-      String email, String password, BuildContext context) async {
+      String name, String email, String password, BuildContext context) async {
     try {
       // Show loading indicator
       showDialog(
@@ -94,23 +95,41 @@ class AuthService {
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
-      // Sign up the user
-      await auth.createUserWithEmailAndPassword(
+      // Sign up the user using Firebase Authentication
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
+
+      // Get Firebase UID of the newly created user
+      String firebaseUID = userCredential.user?.uid ?? '';
+
+      // Use the ApiService provider to save user data to the backend
+      final apiService = ref.read(apiServiceProvider);
+      bool isUserSaved =
+          await apiService.saveUserToBackend(name, email, firebaseUID);
 
       // Dismiss the loading indicator
       Navigator.pop(context);
 
-      // Navigate to the GetStarted page
-      Navigator.pushReplacementNamed(context, '/getStarted');
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content: Text('Account created successfully!'),
-        ),
-      );
+      if (isUserSaved) {
+        // Navigate to the Login page
+        Navigator.pushReplacementNamed(context, '/login');
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('Account created successfully proceed to login!'),
+          ),
+        );
+      } else {
+        // Show error message if saving user data failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content:
+                Text('Failed to save user data to backend. Please try again.'),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       // Dismiss the loading indicator
       Navigator.pop(context);
@@ -119,19 +138,13 @@ class AuthService {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
-          content: Text(e.message!),
+          content: Text(e.message ?? 'An error occurred during registration.'),
         ),
       );
-
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
     }
   }
 
-   Future<String?> getIdToken() async {
+  Future<String?> getIdToken() async {
     try {
       final user = auth.currentUser;
       if (user != null) {
@@ -148,4 +161,3 @@ class AuthService {
     }
   }
 }
-

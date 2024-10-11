@@ -3,15 +3,16 @@ import 'package:intl/intl.dart';
 import 'package:myapp/utils/constants.dart';
 
 class DatePickerForm extends StatelessWidget {
-  const DatePickerForm({super.key, required this.dateController});
+  const DatePickerForm({super.key, required this.dateController, required this.labelText});
   final TextEditingController dateController;
+  final String labelText;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: dateController,
       decoration: InputDecoration(
-        labelText: "Date of Arrival",
+        labelText: labelText,
         hintText: "Pick a date",
         filled: true,
         fillColor: Colors.grey[800],

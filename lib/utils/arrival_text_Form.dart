@@ -7,11 +7,12 @@ class ArrivalTextForm extends StatelessWidget {
       required this.labelText,
       required this.hintText,
       required this.controller,
-      required this.suffixicon});
+      required this.suffixicon,  this.type});
   final String labelText;
   final String hintText;
   final TextEditingController controller;
   final Icon? suffixicon;
+  final TextInputType? type;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class ArrivalTextForm extends StatelessWidget {
         ),
       ),
       style: const TextStyle(color: Colors.white),
-      keyboardType: TextInputType.number,
+      keyboardType: type,
     );
   }
 }

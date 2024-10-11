@@ -1,27 +1,108 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:gap/gap.dart';
 import 'package:myapp/providers/medium_buttons.dart';
+import 'package:myapp/services/api_services.dart'; // Import your API service
 import 'package:myapp/utils/arrival_text_Form.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/date_picker.dart';
 
-class ArrivalDataPage extends ConsumerWidget {
+class ArrivalDataPage extends ConsumerStatefulWidget {
   const ArrivalDataPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Controllers for form fields
-    final TextEditingController quantityController = TextEditingController();
-    final TextEditingController dateController = TextEditingController();
-    final TextEditingController mortalityController = TextEditingController();
-    final TextEditingController shippingMethodController =
-        TextEditingController();
-    final TextEditingController shippingCompanyController =
-        TextEditingController();
-    final TextEditingController acclimatizationDateController =
-        TextEditingController();
+  _ArrivalDataPageState createState() => _ArrivalDataPageState();
+}
 
+class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+
+  // Controllers for form fields
+  final TextEditingController quantityController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController mortalityController = TextEditingController();
+  final TextEditingController commentController = TextEditingController();
+  final TextEditingController shippingCompanyController =
+      TextEditingController();
+  final TextEditingController acclimatizationDateController =
+      TextEditingController();
+
+  String selectedShippingMethod = 'Air';
+  bool _isLoading = false;
+
+  // Function to pick an image from the gallery
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  // Function to handle form submission including image upload and data submission
+  Future<void> _submitArrivalData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final apiService = ref.read(apiServiceProvider);
+
+    // Step 1: Upload the image if selected
+    String? imagePath;
+    if (_selectedImage != null) {
+      imagePath = await apiService.uploadImage(_selectedImage!);
+      if (imagePath == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image upload failed. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
+    // Step 2: Prepare arrival data and submit to the backend
+    Map<String, dynamic> arrivalData = {
+      "batch_id": 1, // Replace with the actual batch ID or get it dynamically
+      "quantity_of_plant_arrived": int.tryParse(quantityController.text) ?? 0,
+      "date_of_arrival": dateController.text,
+      "mortality_rate": int.tryParse(mortalityController.text) ?? 0,
+      "shipping_method": selectedShippingMethod,
+      "shipping_company": shippingCompanyController.text,
+      "image_path":
+          imagePath ?? '', // Use the image URL obtained from the upload API
+      "comment": commentController.text,
+      "acclimatization_date": acclimatizationDateController.text,
+    };
+
+    bool success = await apiService.submitArrivalData(arrivalData);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success
+            ? 'Arrival data submitted successfully.'
+            : 'Failed to submit arrival data.'),
+        backgroundColor: success ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppConstants.backgroundColor,
@@ -45,7 +126,6 @@ class ArrivalDataPage extends ConsumerWidget {
           const Color(0xFF1C1C1C), // Background color from the image
       body: SafeArea(
         child: SingleChildScrollView(
-          // Scrolls the body when the screen size is insufficient
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Padding(
@@ -58,46 +138,98 @@ class ArrivalDataPage extends ConsumerWidget {
                     style: AppConstants.seconTitleTextStyle
                         .copyWith(color: Colors.white, fontSize: 16)),
                 const Gap(30),
+
+                // Image upload field
+                GestureDetector(
+                  onTap:
+                      _pickImage, // Call image picker when the container is tapped
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    color: Colors.grey[800],
+                    child: _selectedImage == null
+                        ? const Center(
+                            child: Text('Tap to pick an image',
+                                style: TextStyle(color: Colors.white)))
+                        : Image.file(_selectedImage!, fit: BoxFit.cover),
+                  ),
+                ),
+                const Gap(20),
+
+                // Comment about the Image
+                ArrivalTextForm(
+                  type: TextInputType.text,
+                  controller: commentController,
+                  labelText: "Image Comment",
+                  hintText: "Enter any comment about the image",
+                  suffixicon: const Icon(
+                    Icons.info_outline_rounded,
+                    color: Colors.white,
+                  ),
+                ),
+                const Gap(20),
+
                 // Quantity of Plant Arrived
                 ArrivalTextForm(
+                  type: const TextInputType.numberWithOptions(),
                   controller: quantityController,
-                  labelText: "Quantity of Plant Arrived",
+                  labelText: "Quantity of Mother plants arrived",
                   hintText: "Enter the number of mother plant",
                   suffixicon: const Icon(
                     Icons.info_outline_rounded,
                     color: Colors.white,
                   ),
                 ),
-
                 const Gap(20),
 
                 // Date of Arrival
                 DatePickerForm(
-                  dateController: dateController,
-                ),
+                    labelText: "Date of Arrival",
+                    dateController: dateController),
                 const Gap(20),
 
                 // Mortality (Optional)
                 ArrivalTextForm(
-                  labelText: "Mortality (Optional)",
-                  hintText: "This is optional",
-                  controller: mortalityController,
-                  suffixicon: const Icon(Icons.info_outline_rounded),
-                ),
-
+                    labelText: "Mortality (Optional)",
+                    hintText: "This is optional",
+                    controller: mortalityController,
+                    suffixicon: const Icon(Icons.info_outline_rounded),
+                    type: const TextInputType.numberWithOptions()),
                 const Gap(20),
 
-                // Shipping Method
-                ArrivalTextForm(
-                  labelText: "Shipping Method",
-                  hintText: "Select your Shipping Method",
-                  controller: shippingMethodController,
-                  suffixicon: const Icon(
-                    Icons.local_shipping,
-                    color: Colors.white,
+                // Shipping Method Dropdown
+                DropdownButtonFormField<String>(
+                  value: selectedShippingMethod,
+                  items: ['Air', 'Truck']
+                      .map((method) => DropdownMenuItem<String>(
+                            value: method,
+                            child: Text(
+                              method,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedShippingMethod = value;
+                      });
+                    }
+                  },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: const Color(0xFF1C1C1C),
+                  decoration: const InputDecoration(
+                    labelText: "Shipping Method",
+                    labelStyle: TextStyle(color: Colors.white),
+                    hintText: "Select your Shipping Method",
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
                   ),
                 ),
-
                 const Gap(20),
 
                 // Shipping Company
@@ -110,77 +242,32 @@ class ArrivalDataPage extends ConsumerWidget {
                     color: Colors.white,
                   ),
                 ),
-
                 const Gap(20),
 
                 // First Acclimatization Date
-                ArrivalTextForm(
-                    labelText: "When is your First acclimatization Date",
-                    hintText: "In 14 Days",
-                    controller: acclimatizationDateController,
-                    suffixicon: const Icon(
-                      Icons.date_range,
-                      color: Colors.white,
-                    )),
-
-                const Gap(30),
-
-                // Save Button
-                const Center(
-                    child: MediumButtons(
-                        text: "Save",
-                        icon: Icon(
-                          Icons.save,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                        color: Colors.green)),
-
+                DatePickerForm(
+                    labelText: "Date for your first acclimatization",
+                    dateController: acclimatizationDateController),
                 const Gap(20),
 
-                // Link for variety details
+                // Save Button
                 Center(
-                  child: TextButton(
-                    onPressed: () {
-                      // Handle navigation to variety details
-                    },
-                    child: Text("Continue with Variety Details",
-                        style: AppConstants.subtitleTextStyle
-                            .copyWith(color: Colors.blue)),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : MediumButtons(
+                          text: "Save",
+                          icon: const Icon(Icons.save,
+                              color: Colors.white, size: 25),
+                          color: Colors.green,
+                          onTap: _submitArrivalData,
+                        ),
                 ),
+                const Gap(20),
               ],
             ),
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Home',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.timeline),
-      //       label: 'Cycle',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.cloud),
-      //       label: 'Forecast',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.report),
-      //       label: 'Report',
-      //     ),
-      //   ],
-      //   currentIndex: 0, // Assuming Home is selected
-      //   selectedItemColor: Colors.green,
-      //   unselectedItemColor: Colors.white,
-      //   backgroundColor: const Color(0xFF1C1C1C), // Matches background color
-      //   onTap: (index) {
-      //     // Handle bottom navigation
-      //   },
-      // ),
     );
   }
 }
