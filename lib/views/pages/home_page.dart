@@ -40,7 +40,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         Navigator.pushNamed(context, "/existBatches");
         break;
       case 2:
-        Navigator.pushNamed(context, "/settings");
+        Navigator.pushNamed(context, "/existBatches");
         break;
     }
   }
@@ -56,7 +56,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     // Temporary hardcoded values
-    const userName = 'Julius';
+    const userName = 'Rhoda';
     const plantsInGreenhouse = 0;
     const cutsDue = 0;
 

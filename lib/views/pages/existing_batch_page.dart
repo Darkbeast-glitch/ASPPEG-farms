@@ -1,3 +1,5 @@
+// File: batches_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/utils/constants.dart';
@@ -15,7 +17,8 @@ class BatchesPage extends ConsumerWidget {
       length: 3, // 3 tabs: Active Batches, Completed, Add Batch
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: AppConstants.backgroundColor, // Use your own color here
+          backgroundColor:
+              AppConstants.backgroundColor, // Use your own color here
           title: Text(
             "View Your Batches",
             style: AppConstants.titleTextStyle
@@ -134,6 +137,13 @@ class BatchesPage extends ConsumerWidget {
             // Handle tab changes here
           },
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, "/arrivalData");
+          },
+          backgroundColor: Colors.green,
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -141,7 +151,8 @@ class BatchesPage extends ConsumerWidget {
   // Helper function to build a batch list
   Widget _buildBatchList(BuildContext context, WidgetRef ref, String tab) {
     // Fetching the list of batches from the API service using a FutureProvider
-    final batchListProvider = FutureProvider<List<Map<String, String>>>((ref) async {
+    final batchListProvider =
+        FutureProvider<List<Map<String, String>>>((ref) async {
       final apiService = ref.read(apiServiceProvider);
       final batches = await apiService.getBatches();
       return batches.map((batch) {
@@ -153,38 +164,39 @@ class BatchesPage extends ConsumerWidget {
     });
 
     return Consumer(
-  builder: (context, ref, child) {
-    final batchListAsyncValue = ref.watch(batchListProvider);
+      builder: (context, ref, child) {
+        final batchListAsyncValue = ref.watch(batchListProvider);
 
-    return batchListAsyncValue.when(
-      data: (batches) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: ListView.builder(
-          itemCount: batches.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: Text(
-                "${index + 1}.",
-                style: const TextStyle(color: Colors.white),
-              ),
-              title: Text(
-                batches[index]["name"]!,
-                style: AppConstants.subtitleTextStyle
-                    .copyWith(color: Colors.white, fontSize: 14),
-              ),
-              trailing: Text(
-                batches[index]["date"]!,
-                style: const TextStyle(color: Colors.white),
-              ),
-            );
-          },
-        ),
-      ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text('Error: $error')),
+        return batchListAsyncValue.when(
+          data: (batches) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ListView.builder(
+              itemCount: batches.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: Text(
+                    "${index + 1}.",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  title: Text(
+                    batches[index]["name"]!,
+                    style: AppConstants.subtitleTextStyle
+                        .copyWith(color: Colors.white, fontSize: 14),
+                  ),
+                  trailing: Text(
+                    batches[index]["date"]!,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              },
+            ),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text('Error: $error')),
+        );
+      },
     );
-  },
-);
-
   }
 }
+
+// File: arrival_data_page.dart
