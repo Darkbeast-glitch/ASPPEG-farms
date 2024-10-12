@@ -84,12 +84,14 @@ class AuthService {
   // Sign out method
   Future<void> signOut() async {
     await auth.signOut();
+    await googleSignIn.signOut(); // Also sign out from Google if logged in with Google
+
+    
   }
 
   Future<void> signUpWithEmailAndPassword(
       String name, String email, String password, BuildContext context) async {
     try {
-      // Show loading indicator using the navigatorKey context
       if (navigatorKey.currentContext != null) {
         showDialog(
           context: navigatorKey.currentContext!,
@@ -99,28 +101,24 @@ class AuthService {
         );
       }
 
-      // Sign up the user using Firebase Authentication
+      // Sign up the user
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
 
-      // Get Firebase UID of the newly created user
       String firebaseUID = userCredential.user?.uid ?? '';
-
-      // Use the ApiService provider to save user data to the backend
       final apiService = ref.read(apiServiceProvider);
       bool isUserSaved =
           await apiService.saveUserToBackend(name, email, firebaseUID);
 
-      // Safely close the dialog using the navigatorKey context
       if (navigatorKey.currentState?.canPop() == true) {
         navigatorKey.currentState?.pop();
       }
 
-      // Check if the current widget is still mounted before navigating
       if (!context.mounted) return;
 
       if (isUserSaved) {
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.green,
@@ -128,14 +126,16 @@ class AuthService {
           ),
         );
 
+        // Logout user (if necessary)
+        await auth.signOut();
+
         // Navigate to the Login page
-        Navigator.of(context).push(
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const LoginPage(),
           ),
-        ); // Ensure this is the correct route
+        );
       } else {
-        // Show error message if saving user data failed
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
@@ -145,12 +145,10 @@ class AuthService {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Safely close the dialog using the navigatorKey context
       if (navigatorKey.currentState?.canPop() == true) {
         navigatorKey.currentState?.pop();
       }
 
-      // Handle errors and show error message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

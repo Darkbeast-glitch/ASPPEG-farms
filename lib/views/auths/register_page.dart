@@ -25,56 +25,56 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   bool _isLoading = false;
 
   Future<void> _registerUser() async {
-  final String name = _fullnameController.text.trim();
-  final String email = _emailController.text.trim();
-  final String password = _passwordController.text.trim();
-  final String confirmPassword = _confirmPasswordController.text.trim();
+    final String name = _fullnameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+    final String confirmPassword = _confirmPasswordController.text.trim();
 
-  // Dismiss the keyboard
-  FocusScope.of(context).unfocus();
+    // Dismiss the keyboard
+    FocusScope.of(context).unfocus();
 
-  // Check if passwords match
-  if (password != confirmPassword) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.red,
-        content: Text('Passwords do not match!'),
-      ),
-    );
-    return;
-  }
-
-  // Show loading indicator
-  if (mounted) {
-    setState(() {
-      _isLoading = true;
-    });
-  }
-
-  try {
-    // Access the auth service and attempt to register the user
-    final authService = ref.read(authSerivceProvider);
-    await authService.signUpWithEmailAndPassword(name, email, password, context);
-  } catch (e) {
-    // Handle any errors that weren't caught in signUpWithEmailAndPassword
-    if (mounted) {
+    // Check if passwords match
+    if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           backgroundColor: Colors.red,
-          content: Text(e.toString() ?? 'An error occurred during registration.'),
+          content: Text('Passwords do not match!'),
         ),
       );
+      return;
     }
-  } finally {
-    // Hide loading indicator only if the widget is still mounted
+
+    // Show loading indicator
     if (mounted) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
     }
-  }
-}
 
+    try {
+      // Access the auth service and attempt to register the user
+      final authService = ref.read(authSerivceProvider);
+      await authService.signUpWithEmailAndPassword(
+          name, email, password, context);
+    } catch (e) {
+      // Handle any errors that weren't caught in signUpWithEmailAndPassword
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(e.toString()),
+          ),
+        );
+      }
+    } finally {
+      // Hide loading indicator only if the widget is still mounted
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,25 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       ),
                       const Gap(30),
                       GestureDetector(
-                        onTap: _registerUser,
+                        onTap: () async {
+                          if (_passwordController.text !=
+                              _confirmPasswordController.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Passwords do not match!'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          try {
+                            await _registerUser();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: ${e.toString()}')),
+                            );
+                          }
+                        },
                         child: Container(
                           height: 47,
                           padding: const EdgeInsets.symmetric(
@@ -177,11 +195,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               ),
                             ],
                           ),
-                          child: Center(
-                            child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white)
-                                : const Text(
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
+                              : const Center(
+                                  child: Text(
                                     "Create account",
                                     style: TextStyle(
                                       fontSize: 14,
@@ -189,9 +207,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                       fontFamily: "Product Sans Regular",
                                     ),
                                   ),
-                          ),
+                                ),
                         ),
                       ),
+
                       const Gap(20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

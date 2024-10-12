@@ -99,7 +99,7 @@ class OnboardingPage extends ConsumerWidget {
             Center(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: screenWidth > 600 ? 600 : screenWidth * 0.8,
+                  maxWidth: screenWidth > 600 ? 600 : screenWidth * 0.7,
                 ),
                 child: SizedBox(
                   height: 300, // Set appropriate height for the cards
@@ -110,7 +110,6 @@ class OnboardingPage extends ConsumerWidget {
                     },
                     children: const [
                       OnboadingCards(
-                        
                         imagePath: "assets/images/smartphone.png",
                         shortDescription:
                             "Crop Disease \nDetection \nin Single Click",
@@ -135,7 +134,7 @@ class OnboardingPage extends ConsumerWidget {
 
             // Page indicator for the PageView
             Align(
-              alignment: const Alignment(0, 0.7),
+              alignment: const Alignment(0, 0.4),
               child: SmoothPageIndicator(
                 controller: controller,
                 count: pageCount, // Ensure this variable is properly defined
@@ -152,7 +151,7 @@ class OnboardingPage extends ConsumerWidget {
 
             // Buttons positioned at the bottom
             Positioned(
-              bottom: 16,
+              bottom: 35,
               left: 32,
               right: 32,
               child: Row(

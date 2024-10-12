@@ -109,11 +109,20 @@ class LoginPage extends ConsumerWidget {
 
                       // Login button
                       GestureDetector(
-                        onTap: () {
-                          ref
-                              .read(authSerivceProvider)
-                              .signInWithEmailAndPassword(emailController.text,
-                                  passwordController.text, context);
+                        onTap: () async {
+                          try {
+                            await ref
+                                .read(authSerivceProvider)
+                                .signInWithEmailAndPassword(
+                                    emailController.text,
+                                    passwordController.text,
+                                    context);
+                          } catch (e) {
+                            // Show an error message if login fails
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
                         },
                         child: Container(
                           height: 47,
@@ -127,8 +136,7 @@ class LoginPage extends ConsumerWidget {
                                 color: Colors.grey.withOpacity(0.3),
                                 spreadRadius: 3,
                                 blurRadius: 7,
-                                offset: const Offset(
-                                    0, 3), // changes position of shadow
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -144,6 +152,7 @@ class LoginPage extends ConsumerWidget {
                           ),
                         ),
                       ),
+
                       const Gap(20),
 
                       // Don't have an account text
@@ -182,7 +191,8 @@ class LoginPage extends ConsumerWidget {
                             padding: EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               "Or Sign In with",
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 13),
                             ),
                           ),
                           Expanded(
