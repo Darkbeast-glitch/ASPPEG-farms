@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:myapp/services/api_services.dart';
-import 'package:myapp/services/auth_services.dart'; // Import AuthService to handle Firebase UID
+import 'package:myapp/services/auth_services.dart';
+import 'package:myapp/utils/constants.dart'; // Import AuthService to handle Firebase UID
 
 class VarietyDetailsPage extends ConsumerStatefulWidget {
   const VarietyDetailsPage({super.key});
@@ -56,7 +57,42 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
     totalLeftController!.text = totalLeft.toString();
   }
 
+  // Function to validate all the forms
+  bool _validateForms() {
+    bool isValid = true;
+
+    for (var form in _varietyForms) {
+      if (form['variety']!.text.isEmpty || // Check if variety is selected
+          form['quantity']!.text.isEmpty || // Check if quantity is entered
+          int.tryParse(form['quantity']!.text) ==
+              null || // Check if quantity is a valid number
+          form['mortality']!.text.isEmpty || // Check if mortality is entered
+          int.tryParse(form['mortality']!.text) == null) {
+        // Check if mortality is a valid number
+        isValid = false;
+        break;
+      }
+    }
+
+    if (!isValid) {
+      // Show a snack bar to inform the user that the form is incomplete
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all required fields with valid data.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    return isValid;
+  }
+
   Future<void> _saveVarietyData() async {
+    // Validate all forms before submitting
+    if (!_validateForms()) {
+      return; // If validation fails, stop the form submission process
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -80,14 +116,69 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
     setState(() {
       _isLoading = false;
     });
+
+    // Show a success SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Variety data saved successfully.'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // Show a confirmation dialog to ask what the user wants to do next
+    _showNextStepDialog();
+  }
+
+  // Function to show the confirmation dialog
+  void _showNextStepDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("What would you like to do next?"),
+          content: const Text(
+              "Would you like to continue with acclimatization or do it later?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Navigate to the acclimatization page (replace with your acclimatization route)
+                Navigator.pushNamed(context, '/acclimatization');
+              },
+              child: const Text("Continue with Acclimatization"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Navigate to the home page (replace with your home page route)
+                Navigator.pushNamed(context, '/home');
+              },
+              child: const Text("Do it Later"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
-        title: const Text('Variety Details'),
-        backgroundColor: Colors.black,
+        title: Text(
+          'Variety Details',
+          style: AppConstants.titleTextStyle
+              .copyWith(color: Colors.white, fontSize: 17),
+        ),
+        backgroundColor: AppConstants.backgroundColor,
+        centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -95,13 +186,6 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Variety Details",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold),
-              ),
               const Gap(15),
               ListView.builder(
                 shrinkWrap: true,
@@ -117,44 +201,38 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
                 children: [
                   ElevatedButton(
                     onPressed: _saveVarietyData, // Save button logic
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Save'),
+                        : Text('Save',
+                            style: AppConstants.buttonTextStyle
+                                .copyWith(color: Colors.white)),
                   ),
                   ElevatedButton(
                     onPressed: _addVarietyForm,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightGreen),
-                    child: const Row(
+                        backgroundColor: Colors.yellow[700]),
+                    child: Row(
                       children: [
-                        Icon(Icons.add_circle_outline),
-                        SizedBox(width: 5),
-                        Text('Add more'),
+                        const Icon(Icons.add_circle_outline),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Add more',
+                          style: AppConstants.subtitleTextStyle
+                              .copyWith(color: Colors.white),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
               const Gap(20),
-              const Center(
-                child: Column(
-                  children: [
-                    Icon(Icons.celebration, color: Colors.green, size: 50),
-                    Gap(10),
-                    Text(
-                      'Variety added Successfully',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
       ),
-      backgroundColor: Colors.black,
     );
   }
 
@@ -167,11 +245,17 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
           Text(
             'Variety Input ${index + 1}',
             style: const TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: "Product Sans Bold"),
           ),
           const Gap(10),
           const Text('Add variety',
-              style: TextStyle(color: Colors.white, fontSize: 14)),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: "Product Sans Regular")),
           const Gap(8),
           DropdownButtonFormField<String>(
             value: _varietyForms[index]['variety']!.text.isNotEmpty
@@ -195,7 +279,8 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
               filled: true,
               fillColor: Colors.grey[700],
               hintText: 'Select a Variety',
-              hintStyle: const TextStyle(color: Colors.white60),
+              hintStyle: const TextStyle(
+                  color: Colors.white60, fontFamily: "Product Sans Regular"),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
@@ -212,7 +297,8 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
               filled: true,
               fillColor: Colors.grey[700],
               hintText: 'Quantity Of variety',
-              hintStyle: const TextStyle(color: Colors.white60),
+              hintStyle: const TextStyle(
+                  color: Colors.white60, fontFamily: "Product Sans Regular"),
               border: const OutlineInputBorder(),
             ),
             onChanged: (_) => _calculateTotalLeft(index),
@@ -226,7 +312,8 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
               filled: true,
               fillColor: Colors.grey[700],
               hintText: 'Mortality (Optional)',
-              hintStyle: const TextStyle(color: Colors.white60),
+              hintStyle: const TextStyle(
+                  color: Colors.white60, fontFamily: "Product Sans Regular"),
               border: const OutlineInputBorder(),
             ),
             onChanged: (_) => _calculateTotalLeft(index),
@@ -240,7 +327,8 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
               filled: true,
               fillColor: Colors.grey[700],
               hintText: 'Total Left',
-              hintStyle: const TextStyle(color: Colors.white60),
+              hintStyle: const TextStyle(
+                  color: Colors.white60, fontFamily: "Product Sans Regular"),
               border: const OutlineInputBorder(),
             ),
           ),

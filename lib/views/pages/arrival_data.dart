@@ -46,6 +46,7 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
   }
 
   // Function to handle form submission including image upload and data submission
+  // Function to handle form submission including image upload and data submission
   Future<void> _submitArrivalData() async {
     setState(() {
       _isLoading = true;
@@ -98,6 +99,41 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
             : 'Failed to submit arrival data.'),
         backgroundColor: success ? Colors.green : Colors.red,
       ),
+    );
+
+    if (success) {
+      _showConfirmationDialog();
+    }
+  }
+
+  // Function to show the confirmation dialog
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("What would you like to do next?"),
+          content: const Text(
+              "Would you like to continue entering variety or go back to the home page?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Navigate to the variety entry page (replace with your variety page route)
+                Navigator.pushNamed(context, '/varietyData');
+              },
+              child: const Text("Enter Variety"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pop(context); // Go back to home or previous screen
+              },
+              child: const Text("Go Back Home"),
+            ),
+          ],
+        );
+      },
     );
   }
 

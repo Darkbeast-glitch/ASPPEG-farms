@@ -20,7 +20,7 @@ class Routes {
       '/onboarding': (context) => const OnboardingPage(),
       '/login': (context) => const LoginPage(),
       '/register': (context) => const RegisterPage(),
-      '/profile': (context) => ProfilePage(),
+      '/profile': (context) => const ProfilePage(),
       '/newBatch': (context) => const NewBatchScreen(),
       '/existBatches': (context) => BatchesPage(),
       '/arrivalData': (context) => const ArrivalDataPage(),

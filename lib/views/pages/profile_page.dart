@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/auth_services.dart';
 import 'package:myapp/utils/my_buttons.dart';
 import 'package:myapp/views/auths/auth_gate.dart';
-import 'package:myapp/views/auths/login_or_register.dart';
-import 'package:myapp/views/auths/login_page.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
