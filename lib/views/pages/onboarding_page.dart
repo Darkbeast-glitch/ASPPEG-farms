@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/my_buttons.dart';
 import 'package:myapp/utils/onboarding_card.dart';
-import 'package:myapp/providers/onboarding_provider.dart'; // Import the provider
+import 'package:myapp/providers/onboarding_provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import shared preferences
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 
 class OnboardingPage extends ConsumerWidget {
@@ -15,7 +15,8 @@ class OnboardingPage extends ConsumerWidget {
   Future<void> _completeOnboarding(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasViewedOnboarding', true); // Save onboarding status
-    Navigator.pushReplacementNamed(context, '/auth'); // Navigate to login/auth page
+    Navigator.pushReplacementNamed(
+        context, '/auth'); // Navigate to login/auth page
   }
 
   @override
@@ -23,6 +24,7 @@ class OnboardingPage extends ConsumerWidget {
     // Initialize the PageController within the build method
     final currentPage = ref.watch(currentPageProvider);
     final controller = PageController(initialPage: currentPage);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: SafeArea(
@@ -31,7 +33,7 @@ class OnboardingPage extends ConsumerWidget {
             // Background image with a darker overlay
             ColorFiltered(
               colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.5), // Darken the image
+                Colors.black.withOpacity(0.5),
                 BlendMode.darken,
               ),
               child: Image.asset(
@@ -44,9 +46,9 @@ class OnboardingPage extends ConsumerWidget {
 
             // Blur effect
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3), // Subtle blur
+              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
               child: Container(
-                color: Colors.black.withOpacity(0), // Transparent overlay
+                color: Colors.black.withOpacity(0),
               ),
             ),
 
@@ -73,58 +75,60 @@ class OnboardingPage extends ConsumerWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
 
             // App title text
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 100),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "ASPPEG REPORT APP",
-                    style: AppConstants.titleTextStyle.copyWith(
-                      fontSize: 23,
-                      color: Colors.white,
-                    ),
+              padding: const EdgeInsets.only(top: 80.0),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  "ASPPEG REPORT APP",
+                  style: AppConstants.titleTextStyle.copyWith(
+                    fontSize: 23,
+                    color: Colors.white,
                   ),
-                ],
+                ),
               ),
             ),
 
             // PageView for onboarding cards
             Center(
-              child: SizedBox(
-                height: 300, // Set appropriate height for the cards
-                width: MediaQuery.of(context).size.width *
-                    0.65, // Set width to 65% of the screen width
-                child: PageView(
-                  controller: controller,
-                  onPageChanged: (index) {
-                    ref.read(currentPageProvider.notifier).state = index;
-                  },
-                  children: const [
-                    OnboadingCards(
-                      imagePath: "assets/images/smartphone.png",
-                      shortDescription:
-                          "Crop Disease \nDetection \nin Single Click",
-                    ),
-                    OnboadingCards(
-                      imagePath: "assets/images/report.png",
-                      shortDescription: "Detailed \nAnalysis \nFor Experts",
-                    ),
-                    OnboadingCards(
-                      imagePath: "assets/images/Insect.png",
-                      shortDescription: "Monitor your\nPest",
-                    ),
-                    OnboadingCards(
-                      imagePath: "assets/images/calculator.png",
-                      shortDescription: "Generate \nReports \nEffortlessly",
-                    ),
-                  ],
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: screenWidth > 600 ? 600 : screenWidth * 0.8,
+                ),
+                child: SizedBox(
+                  height: 300, // Set appropriate height for the cards
+                  child: PageView(
+                    controller: controller,
+                    onPageChanged: (index) {
+                      ref.read(currentPageProvider.notifier).state = index;
+                    },
+                    children: const [
+                      OnboadingCards(
+                        
+                        imagePath: "assets/images/smartphone.png",
+                        shortDescription:
+                            "Crop Disease \nDetection \nin Single Click",
+                      ),
+                      OnboadingCards(
+                        imagePath: "assets/images/report.png",
+                        shortDescription: "Detailed \nAnalysis \nFor Experts",
+                      ),
+                      OnboadingCards(
+                        imagePath: "assets/images/Insect.png",
+                        shortDescription: "Monitor your\nPest",
+                      ),
+                      OnboadingCards(
+                        imagePath: "assets/images/calculator.png",
+                        shortDescription: "Generate \nReports \nEffortlessly",
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -133,9 +137,9 @@ class OnboardingPage extends ConsumerWidget {
             Align(
               alignment: const Alignment(0, 0.7),
               child: SmoothPageIndicator(
-                controller: controller, // PageController
-                count: pageCount, // Number of pages
-                effect: const WormEffect(), // Smooth indicator effect
+                controller: controller,
+                count: pageCount, // Ensure this variable is properly defined
+                effect: const WormEffect(),
                 onDotClicked: (index) {
                   controller.animateToPage(
                     index,
@@ -148,15 +152,13 @@ class OnboardingPage extends ConsumerWidget {
 
             // Buttons positioned at the bottom
             Positioned(
-              bottom: 8,
-              left: 40,
-              right: 40,
+              bottom: 16,
+              left: 32,
+              right: 32,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const MyButton(text: "Login"),
-
-                  // Updated Next/Get Started Button Logic
                   MyButton(
                     text: currentPage == pageCount - 1 ? "Get started" : "Next",
                     onTap: () {
@@ -166,7 +168,6 @@ class OnboardingPage extends ConsumerWidget {
                           curve: Curves.easeInOut,
                         );
                       } else {
-                        // Call method to complete onboarding and navigate to auth page
                         _completeOnboarding(context);
                       }
                     },

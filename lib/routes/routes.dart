@@ -8,6 +8,7 @@ import 'package:myapp/views/pages/get_started_page.dart';
 import 'package:myapp/views/pages/new_batch.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';
 import 'package:myapp/views/pages/profile_page.dart';
+import 'package:myapp/views/pages/variety_data.dart';
 
 class Routes {
   static Map<String, WidgetBuilder> getRoutes() {
@@ -21,6 +22,7 @@ class Routes {
       '/newBatch': (context) => const NewBatchScreen(),
       '/existBatches': (context) => BatchesPage(),
       '/arrivalData': (context) => const ArrivalDataPage(),
+      '/varietyData': (context) => const VarietyDetailsPage(),
 
       // Add other routes here
     };

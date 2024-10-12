@@ -236,9 +236,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                   color: const Color(0xFF363836),
                 ),
                 const Gap(10),
-                const MediumButtons(
+                MediumButtons(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/varietyData");
+                    },
                     text: "Issue",
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.report_problem,
                       color: Colors.white,
                     ),

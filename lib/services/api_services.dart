@@ -13,7 +13,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   final AuthService authService;
   static const String baseUrl =
-      'https://1658-102-176-94-11.ngrok-free.app'; // Use your Ngrok URL
+      'https://e81f-102-176-94-11.ngrok-free.app'; // Use your Ngrok URL
 
   ApiService(this.authService);
 
@@ -198,4 +198,119 @@ class ApiService {
       return false;
     }
   }
+
+  // Method to add variety data
+  Future<bool> addVarietyData(Map<String, dynamic> varietyData) async {
+    final uri = Uri.parse('$baseUrl/variety/add_variety_data');
+    String? firebaseToken = await authService.getIdToken();
+
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    try {
+      var response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(varietyData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Variety data added successfully.');
+        return true; // Successful addition
+      } else {
+        print(
+            'Failed to add variety data. Status code: ${response.statusCode}');
+        return false; // Failure in addition
+      }
+    } catch (e) {
+      print('Error adding variety data: $e');
+      return false; // Error occurred
+    }
+  }
+
+  // Method to fetch variety data
+  Future<List<Map<String, dynamic>>> getVarietyData() async {
+    final uri = Uri.parse('$baseUrl/variety/get_variety_data');
+    String? firebaseToken = await authService.getIdToken();
+
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return [];
+    }
+
+    try {
+      var response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        print(
+            'Failed to fetch variety data. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching variety data: $e');
+      return [];
+    }
+  }
+
+
+  
+  // Method to fetch the full name of the user from FastAPI using the Firebase UID
+  Future<String?> fetchUserFullName(String firebaseUID) async {
+    final uri = Uri.parse('$baseUrl/users/get_user_full_name/$firebaseUID');
+
+    try {
+      final response = await http.get(uri, headers: {
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData['name']; // Assuming your API returns the user's name in the 'name' field
+      } else {
+        print('Failed to fetch user full name. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching user full name: $e');
+      return null;
+    }
+  }
+
+
+// method to fetch the variety names
+  Future<List<String>> fetchVarietyNames() async {
+  final uri = Uri.parse('$baseUrl/variety/get_variety_names');
+
+  try {
+    final response = await http.get(uri, headers: {
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      List<dynamic> responseData = jsonDecode(response.body);
+      return responseData.cast<String>();
+    } else {
+      print('Failed to fetch variety names. Status code: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching variety names: $e');
+    return [];
+  }
+}
+
 }

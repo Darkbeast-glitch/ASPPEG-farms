@@ -8,6 +8,7 @@ final authSerivceProvider = Provider<AuthService>((ref) {
   return AuthService(
       auth: FirebaseAuth.instance, googleSignIn: GoogleSignIn(), ref: ref);
 });
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class AuthService {
   FirebaseAuth auth;
@@ -84,65 +85,80 @@ class AuthService {
     await auth.signOut();
   }
 
-  // Method to sign up users
-  Future<void> signUpWithEmailAndPassword(
-      String name, String email, String password, BuildContext context) async {
-    try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
+    // Method to sign up users
+    Future<void> signUpWithEmailAndPassword(
+        String name, String email, String password, BuildContext context) async {
+      try {
+        // Show loading indicator using the navigatorKey context
+        if (navigatorKey.currentContext != null) {
+          showDialog(
+            context: navigatorKey.currentContext!,
+            barrierDismissible: false,
+            builder: (context) =>
+                const Center(child: CircularProgressIndicator()),
+          );
+        }
 
-      // Sign up the user using Firebase Authentication
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        // Sign up the user using Firebase Authentication
+        UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+            email: email, password: password);
 
-      // Get Firebase UID of the newly created user
-      String firebaseUID = userCredential.user?.uid ?? '';
+        // Get Firebase UID of the newly created user
+        String firebaseUID = userCredential.user?.uid ?? '';
 
-      // Use the ApiService provider to save user data to the backend
-      final apiService = ref.read(apiServiceProvider);
-      bool isUserSaved =
-          await apiService.saveUserToBackend(name, email, firebaseUID);
+        // Use the ApiService provider to save user data to the backend
+        final apiService = ref.read(apiServiceProvider);
+        bool isUserSaved =
+            await apiService.saveUserToBackend(name, email, firebaseUID);
 
-      // Dismiss the loading indicator
-      Navigator.pop(context);
+        // Safely close the dialog using the navigatorKey context
+        if (navigatorKey.currentState?.canPop() == true) {
+          navigatorKey.currentState?.pop();
+        }
 
-      if (isUserSaved) {
-        // Navigate to the Login page
-        Navigator.pushReplacementNamed(context, '/login');
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.green,
-            content: Text('Account created successfully proceed to login!'),
-          ),
-        );
-      } else {
-        // Show error message if saving user data failed
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.red,
-            content:
-                Text('Failed to save user data to backend. Please try again.'),
-          ),
-        );
+        // Check if the current widget is still mounted before navigating
+        if (!context.mounted) return;
+
+        if (isUserSaved) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.green,
+              content: Text('Account created successfully, proceed to login!'),
+            ),
+          );
+
+          // Navigate to the Login page
+          Navigator.pushReplacementNamed(
+              context, '/login'); // Ensure this is the correct route
+        } else {
+          // Show error message if saving user data failed
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.red,
+              content:
+                  Text('Failed to save user data to backend. Please try again.'),
+            ),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        // Safely close the dialog using the navigatorKey context
+        if (navigatorKey.currentState?.canPop() == true) {
+          navigatorKey.currentState?.pop();
+        }
+
+        // Handle errors and show error message
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red,
+              content:
+                  Text(e.message ?? 'An error occurred during registration.'),
+            ),
+          );
+        }
       }
-    } on FirebaseAuthException catch (e) {
-      // Dismiss the loading indicator
-      Navigator.pop(context);
-
-      // Handle errors and show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(e.message ?? 'An error occurred during registration.'),
-        ),
-      );
     }
-  }
 
   Future<String?> getIdToken() async {
     try {
