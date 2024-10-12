@@ -19,7 +19,6 @@ class AuthPage extends StatelessWidget {
       body: FutureBuilder<bool>(
         future: _hasViewedOnboarding(),
         builder: (context, onboardingSnapshot) {
-          // While loading shared preferences
           if (onboardingSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -30,7 +29,7 @@ class AuthPage extends StatelessWidget {
           }
 
           // Otherwise, check if the user is logged in or not
-          return StreamBuilder(
+          return StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

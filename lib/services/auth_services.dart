@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:myapp/services/api_services.dart';
+import 'package:myapp/views/auths/login_page.dart';
 
 final authSerivceProvider = Provider<AuthService>((ref) {
   return AuthService(
       auth: FirebaseAuth.instance, googleSignIn: GoogleSignIn(), ref: ref);
 });
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class AuthService {
   FirebaseAuth auth;
@@ -82,46 +84,58 @@ class AuthService {
   // Sign out method
   Future<void> signOut() async {
     await auth.signOut();
+    await googleSignIn.signOut(); // Also sign out from Google if logged in with Google
+
+    
   }
 
-  // Method to sign up users
   Future<void> signUpWithEmailAndPassword(
       String name, String email, String password, BuildContext context) async {
     try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+      if (navigatorKey.currentContext != null) {
+        showDialog(
+          context: navigatorKey.currentContext!,
+          barrierDismissible: false,
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      // Sign up the user
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      // Sign up the user using Firebase Authentication
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-
-      // Get Firebase UID of the newly created user
       String firebaseUID = userCredential.user?.uid ?? '';
-
-      // Use the ApiService provider to save user data to the backend
       final apiService = ref.read(apiServiceProvider);
       bool isUserSaved =
           await apiService.saveUserToBackend(name, email, firebaseUID);
 
-      // Dismiss the loading indicator
-      Navigator.pop(context);
+      if (navigatorKey.currentState?.canPop() == true) {
+        navigatorKey.currentState?.pop();
+      }
+
+      if (!context.mounted) return;
 
       if (isUserSaved) {
-        // Navigate to the Login page
-        Navigator.pushReplacementNamed(context, '/login');
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.green,
-            content: Text('Account created successfully proceed to login!'),
+            content: Text('Account created successfully, proceed to login!'),
+          ),
+        );
+
+        // Logout user (if necessary)
+        await auth.signOut();
+
+        // Navigate to the Login page
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const LoginPage(),
           ),
         );
       } else {
-        // Show error message if saving user data failed
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
@@ -131,16 +145,19 @@ class AuthService {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Dismiss the loading indicator
-      Navigator.pop(context);
+      if (navigatorKey.currentState?.canPop() == true) {
+        navigatorKey.currentState?.pop();
+      }
 
-      // Handle errors and show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(e.message ?? 'An error occurred during registration.'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content:
+                Text(e.message ?? 'An error occurred during registration.'),
+          ),
+        );
+      }
     }
   }
 

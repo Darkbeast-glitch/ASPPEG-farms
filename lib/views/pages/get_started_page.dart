@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 
 import 'package:myapp/utils/constants.dart';
-import 'package:myapp/utils/my_buttons.dart'; // Needed for the BackdropFilter widget
+import 'package:myapp/utils/my_buttons.dart';
 
 class GetStartedPage extends StatelessWidget {
   const GetStartedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Stack(
         children: [
@@ -36,46 +37,50 @@ class GetStartedPage extends StatelessWidget {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Image.asset(
-                      'assets/images/Logo.png', // Example logo image
-                      width: 200,
-                      height: 200,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: screenWidth > 600 ? 600 : screenWidth * 0.9,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Image.asset(
+                        'assets/images/Logo.png', // Example logo image
+                        width: 200,
+                        height: 200,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'ASPPEG REPORT APP',
-                    style: AppConstants.titleTextStyle.copyWith(
-                      fontSize: 23, // Example font size
-                      color: Colors.white, // Example color
+                    const SizedBox(height: 16),
+                    Text(
+                      'ASPPEG REPORT APP',
+                      style: AppConstants.titleTextStyle.copyWith(
+                        fontSize: 23, // Example font size
+                        color: Colors.white, // Example color
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const Spacer(),
-                  const Text(
-                    'Smart Reporting for Better\nSweet Potato Yield',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: "Product Sans Regular",
-                      color: Colors.white,
+                    const Spacer(),
+                    const Text(
+                      'Smart Reporting for Better\nSweet Potato Yield',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: "Product Sans Regular",
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  // my button
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  MyButton(
-                    text: "Get Started",
-                    onTap: () {
-                      Navigator.pushNamed(context, '/onboarding');
-                    },
-                  )
-                ],
+                    const SizedBox(height: 10),
+                    MyButton(
+                      text: "Get Started",
+                      onTap: () {
+                        Navigator.pushNamed(context, '/onboarding');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

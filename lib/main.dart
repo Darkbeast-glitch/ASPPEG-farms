@@ -8,31 +8,34 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    runApp(
+      const ProviderScope(
+        child: MyApp(),
+      ),
+    );
+  } catch (e) {
+    // Handle Firebase initialization errors
+    print('Error initializing Firebase: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'APPEG ',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData( 
+      theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-        
       ),
-      navigatorKey: navigatorKey,
+      navigatorKey: navigatorKey, // This allows for global navigation
       initialRoute: '/', // Set the initial route
       routes: Routes.getRoutes(), // Use the routes from routes.dart
     );
