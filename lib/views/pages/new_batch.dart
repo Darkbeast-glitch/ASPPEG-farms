@@ -26,47 +26,61 @@ class _NewBatchScreenState extends ConsumerState<NewBatchScreen> {
   }
 
   Future<void> _createBatch() async {
-    // Get the ApiService from the provider
-    final apiService = ref.read(apiServiceProvider);
+  // Get the ApiService from the provider
+  final apiService = ref.read(apiServiceProvider);
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+  // Trim the input value
+  final batchName = _batchNameController.text.trim();
 
-    try {
-      // Call the API to create a new batch
-      await apiService.createBatch(_batchNameController.text);
-
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Batch created successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Clear the input field
-      _batchNameController.clear();
-
-      // Navigate to the target page after successful batch creation
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              const ArrivalDataPage(), // Replace with your actual target screen
-        ),
-      );
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to create batch: $e';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  // Check if the batch name is empty
+  if (batchName.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please enter a batch name!'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return; // Exit the function if the batch name is empty
   }
+
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
+
+  try {
+    // Call the API to create a new batch
+    await apiService.createBatch(batchName);
+
+    // Show a success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Batch created successfully!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // Clear the input field
+    _batchNameController.clear();
+
+    // Navigate to the target page after successful batch creation
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ArrivalDataPage(), // Replace with your actual target screen
+      ),
+    );
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Failed to create batch: $e';
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
