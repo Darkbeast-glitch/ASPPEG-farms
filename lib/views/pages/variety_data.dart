@@ -143,7 +143,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 // Navigate to the acclimatization page (replace with your acclimatization route)
-                Navigator.pushNamed(context, '/acclimatization');
+                Navigator.pushNamed(context, '/addAcclimatization');
               },
               child: const Text("Continue with Acclimatization"),
             ),

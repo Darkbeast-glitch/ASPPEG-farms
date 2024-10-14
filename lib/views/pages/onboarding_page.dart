@@ -134,11 +134,18 @@ class OnboardingPage extends ConsumerWidget {
 
             // Page indicator for the PageView
             Align(
-              alignment: const Alignment(0, 0.4),
+              alignment: const Alignment(0, 0.6),
               child: SmoothPageIndicator(
                 controller: controller,
                 count: pageCount, // Ensure this variable is properly defined
-                effect: const WormEffect(),
+                effect: const WormEffect(
+                  dotWidth: 8.0, // Adjust the dot width
+                  dotHeight: 8.0, // Adjust the dot height
+                  spacing: 12.0, // Adjust the spacing between dots
+                  dotColor: Colors.grey, // Customize the color of inactive dots
+                  activeDotColor:
+                      Colors.blue, // Customize the color of active dots
+                ),
                 onDotClicked: (index) {
                   controller.animateToPage(
                     index,
