@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/views/auths/auth_gate.dart';
 import 'package:myapp/views/auths/login_page.dart';
 import 'package:myapp/views/auths/register_page.dart';
+import 'package:myapp/views/pages/first_acclimatization_page.dart';
 import 'package:myapp/views/pages/arrival_data.dart';
 import 'package:myapp/views/pages/existing_batch_page.dart';
 import 'package:myapp/views/pages/get_started_page.dart';
@@ -9,6 +10,7 @@ import 'package:myapp/views/pages/home_page.dart';
 import 'package:myapp/views/pages/new_batch.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';
 import 'package:myapp/views/pages/profile_page.dart';
+import 'package:myapp/views/pages/second_acclimatizaton_page.dart';
 import 'package:myapp/views/pages/variety_data.dart';
 
 class Routes {
@@ -25,6 +27,8 @@ class Routes {
       '/existBatches': (context) => BatchesPage(),
       '/arrivalData': (context) => const ArrivalDataPage(),
       '/varietyData': (context) => const VarietyDetailsPage(),
+      '/addAcclimatization': (context) => const AcclimatizationPage(),
+      '/secondAcclimatization': (context) => const SecondAcclimatizationPage(),
 
       // Add other routes here
     };

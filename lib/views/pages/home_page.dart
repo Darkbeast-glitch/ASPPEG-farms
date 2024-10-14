@@ -226,7 +226,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 MediumButtons(
                   onTap: () {
-                    Navigator.pushNamed(context, "/arrivalData");
+                    Navigator.pushNamed(context, "/varietyData");
                   },
                   text: "Report",
                   icon: const Icon(
@@ -238,7 +238,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const Gap(10),
                 MediumButtons(
                     onTap: () {
-                      Navigator.pushNamed(context, "/varietyData");
+                      Navigator.pushNamed(context, "/addAcclimatization");
                     },
                     text: "Issue",
                     icon: const Icon(

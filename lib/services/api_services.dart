@@ -13,7 +13,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   final AuthService authService;
   static const String baseUrl =
-      'https://e81f-102-176-94-11.ngrok-free.app'; // Use your Ngrok URL
+      'https://2b18-102-176-94-41.ngrok-free.app'; // Use your Ngrok URL
 
   ApiService(this.authService);
 
@@ -266,8 +266,6 @@ class ApiService {
     }
   }
 
-
-  
   // Method to fetch the full name of the user from FastAPI using the Firebase UID
   Future<String?> fetchUserFullName(String firebaseUID) async {
     final uri = Uri.parse('$baseUrl/users/get_user_full_name/$firebaseUID');
@@ -279,9 +277,11 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        return responseData['name']; // Assuming your API returns the user's name in the 'name' field
+        return responseData[
+            'name']; // Assuming your API returns the user's name in the 'name' field
       } else {
-        print('Failed to fetch user full name. Status code: ${response.statusCode}');
+        print(
+            'Failed to fetch user full name. Status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {
@@ -290,27 +290,165 @@ class ApiService {
     }
   }
 
-
 // method to fetch the variety names
   Future<List<String>> fetchVarietyNames() async {
-  final uri = Uri.parse('$baseUrl/variety/get_variety_names');
+    final uri = Uri.parse('$baseUrl/variety/get_variety_names');
 
-  try {
-    final response = await http.get(uri, headers: {
-      'Content-Type': 'application/json',
-    });
+    try {
+      final response = await http.get(uri, headers: {
+        'Content-Type': 'application/json',
+      });
 
-    if (response.statusCode == 200) {
-      List<dynamic> responseData = jsonDecode(response.body);
-      return responseData.cast<String>();
-    } else {
-      print('Failed to fetch variety names. Status code: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = jsonDecode(response.body);
+        return responseData.cast<String>();
+      } else {
+        print(
+            'Failed to fetch variety names. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching variety names: $e');
       return [];
     }
-  } catch (e) {
-    print('Error fetching variety names: $e');
-    return [];
   }
-}
 
+  // Function to add acclimatization data
+  Future<bool> addAcclimatization(
+      Map<String, dynamic> acclimatizationData) async {
+    // Get Firebase ID token
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/aclamimtization_data/add_acclimatization');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(acclimatizationData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Acclimatization data submitted successfully.');
+        return true;
+      } else {
+        print(
+            'Failed to submit acclimatization data. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error submitting acclimatization data: $e');
+      return false;
+    }
+  }
+
+  // Fetch available varieties for selection
+  Future<List<dynamic>> getAvailableVarieties() async {
+    // Get Firebase ID token
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return [];
+    }
+
+    final url = Uri.parse('$baseUrl/aclamimtization_data/get_acclimatization');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Failed to fetch varieties. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching varieties: $e');
+      return [];
+    }
+  }
+
+  // Fetch all varieties with total_left from the first acclimatization
+  Future<List<Map<String, dynamic>>> getFirstAcclimatizationData(
+      {int? varietyId}) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return [];
+    }
+
+    try {
+      // Build the URL with the variety_id as a query parameter if provided
+      Uri url = Uri.parse('$baseUrl/aclamimtization_data/get_acclimatization');
+      if (varietyId != null) {
+        url =
+            url.replace(queryParameters: {'variety_id': varietyId.toString()});
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        print(
+            'Failed to fetch acclimatization data. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching acclimatization data: $e');
+      return [];
+    }
+  }
+
+  // Add a second acclimatization entry (Same logic as first, but for second acclimatization)
+  Future<bool> addSecondAcclimatization(
+      Map<String, dynamic> acclimatizationData) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/secon_accl/add_second_acclimatization');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(acclimatizationData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Second acclimatization data submitted successfully.');
+        return true;
+      } else {
+        print(
+            'Failed to submit second acclimatization data. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error submitting second acclimatization data: $e');
+      return false;
+    }
+  }
 }
