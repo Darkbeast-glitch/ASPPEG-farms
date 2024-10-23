@@ -5,7 +5,6 @@ import 'package:myapp/providers/medium_buttons.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/my_textfield.dart';
-import 'package:myapp/views/pages/arrival_data.dart';
 
 class NewBatchScreen extends ConsumerStatefulWidget {
   const NewBatchScreen({super.key});
@@ -26,61 +25,84 @@ class _NewBatchScreenState extends ConsumerState<NewBatchScreen> {
   }
 
   Future<void> _createBatch() async {
-  // Get the ApiService from the provider
-  final apiService = ref.read(apiServiceProvider);
+    // Get the ApiService from the provider
+    final apiService = ref.read(apiServiceProvider);
 
-  // Trim the input value
-  final batchName = _batchNameController.text.trim();
+    // Trim the input value
+    final batchName = _batchNameController.text.trim();
 
-  // Check if the batch name is empty
-  if (batchName.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please enter a batch name!'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return; // Exit the function if the batch name is empty
+    // Check if the batch name is empty
+    if (batchName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a batch name!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // Exit the function if the batch name is empty
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Call the API to create a new batch
+      await apiService.createBatch(batchName);
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Batch created successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Clear the input field
+      _batchNameController.clear();
+
+      // Show the dialog for the next steps
+      _showNextStepDialog();
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to create batch: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  setState(() {
-    _isLoading = true;
-    _errorMessage = null;
-  });
-
-  try {
-    // Call the API to create a new batch
-    await apiService.createBatch(batchName);
-
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Batch created successfully!'),
-        backgroundColor: Colors.green,
-      ),
+  void _showNextStepDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("What's Next?"),
+          content: const Text(
+              "Batch created successfully. Would you like to go to Existing Batches or go back Home?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushNamed(context, "/existBatches");
+              },
+              child: const Text("Go to Existing Batches"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushNamed(context, "/home");
+              },
+              child: const Text("Go Home"),
+            ),
+          ],
+        );
+      },
     );
-
-    // Clear the input field
-    _batchNameController.clear();
-
-    // Navigate to the target page after successful batch creation
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ArrivalDataPage(), // Replace with your actual target screen
-      ),
-    );
-  } catch (e) {
-    setState(() {
-      _errorMessage = 'Failed to create batch: $e';
-    });
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
