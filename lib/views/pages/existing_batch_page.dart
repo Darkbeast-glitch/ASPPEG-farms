@@ -6,19 +6,49 @@ import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/my_textfield.dart';
 import 'package:myapp/services/api_services.dart';
 
-class BatchesPage extends ConsumerWidget {
-  BatchesPage({super.key});
-  final searchController = TextEditingController();
-  final obsecureText = false;
+class BatchesPage extends ConsumerStatefulWidget {
+  const BatchesPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _BatchesPageState createState() => _BatchesPageState();
+}
+
+class _BatchesPageState extends ConsumerState<BatchesPage> {
+  final searchController = TextEditingController();
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Using switch case to navigate to different pages
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, "/home");
+        break;
+      case 1:
+        Navigator.pushNamed(context, "/greenHouse");
+        break;
+      case 2:
+        Navigator.pushNamed(context, "/forecast");
+        break;
+      case 3:
+        Navigator.pushNamed(context, "/settings");
+        break;
+      case 4:
+        Navigator.pushNamed(context, "/report");
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3, // 3 tabs: Active Batches, Completed, Add Batch
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor:
-              AppConstants.backgroundColor, // Use your own color here
+          backgroundColor: AppConstants.backgroundColor,
           title: Text(
             "View Your Batches",
             style: AppConstants.titleTextStyle
@@ -53,9 +83,11 @@ class BatchesPage extends ConsumerWidget {
                   color: Colors.white,
                   size: 25,
                 ),
-                child: Text("Active Batches",
-                    style: AppConstants.subtitleTextStyle
-                        .copyWith(color: Colors.white, fontSize: 13)),
+                child: Text(
+                  "Active Batches",
+                  style: AppConstants.subtitleTextStyle
+                      .copyWith(color: Colors.white, fontSize: 13),
+                ),
               ),
               Tab(
                 icon: const Icon(
@@ -63,9 +95,11 @@ class BatchesPage extends ConsumerWidget {
                   color: Colors.white,
                   size: 25,
                 ),
-                child: Text("Completed",
-                    style: AppConstants.subtitleTextStyle
-                        .copyWith(color: Colors.white, fontSize: 13)),
+                child: Text(
+                  "Completed",
+                  style: AppConstants.subtitleTextStyle
+                      .copyWith(color: Colors.white, fontSize: 13),
+                ),
               ),
               Tab(
                 icon: const Icon(
@@ -73,9 +107,11 @@ class BatchesPage extends ConsumerWidget {
                   color: Colors.white,
                   size: 25,
                 ),
-                child: Text("Add Batch",
-                    style: AppConstants.subtitleTextStyle
-                        .copyWith(color: Colors.white, fontSize: 13)),
+                child: Text(
+                  "Add Batch",
+                  style: AppConstants.subtitleTextStyle
+                      .copyWith(color: Colors.white, fontSize: 13),
+                ),
               ),
             ],
           ),
@@ -88,10 +124,11 @@ class BatchesPage extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: MyTextForm(
-                    hintText: "Search for batch name",
-                    prefix: const Icon(Icons.search),
-                    controller: searchController,
-                    obsecureText: false),
+                  hintText: "Search for batch name",
+                  prefix: const Icon(Icons.search),
+                  controller: searchController,
+                  obsecureText: false,
+                ),
               ),
               // Tab Bar View
               Expanded(
@@ -116,26 +153,37 @@ class BatchesPage extends ConsumerWidget {
             ],
           ),
         ),
-        // Bottom Navigation Bar
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed, // Allows more than three items
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(
+                Icons.home,
+                size: 14,
+              ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.batch_prediction),
-              label: 'Batches',
+              icon: Icon(size: 14, Icons.batch_prediction),
+              label: 'All varieties',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
+              icon: Icon(size: 14, Icons.data_exploration),
+              label: 'Forecast',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                size: 14,
+                Icons.report,
+              ),
+              label: 'Report',
             ),
           ],
-          currentIndex: 1, // Highlight the Batches tab
-          onTap: (index) {
-            // Handle tab changes here
-          },
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.green,
+          unselectedItemColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 33, 29, 29),
+          onTap: _onItemTapped,
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -150,7 +198,6 @@ class BatchesPage extends ConsumerWidget {
 
   // Helper function to build a batch list
   Widget _buildBatchList(BuildContext context, WidgetRef ref, String tab) {
-    // Fetching the list of batches from the API service using a FutureProvider
     final batchListProvider =
         FutureProvider<List<Map<String, String>>>((ref) async {
       final apiService = ref.read(apiServiceProvider);
@@ -178,10 +225,15 @@ class BatchesPage extends ConsumerWidget {
                     "${index + 1}.",
                     style: const TextStyle(color: Colors.white),
                   ),
-                  title: Text(
-                    batches[index]["name"]!,
-                    style: AppConstants.subtitleTextStyle
-                        .copyWith(color: Colors.white, fontSize: 14),
+                  title: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/greenHouse");
+                    },
+                    child: Text(
+                      batches[index]["name"]!,
+                      style: AppConstants.subtitleTextStyle
+                          .copyWith(color: Colors.white, fontSize: 14),
+                    ),
                   ),
                   trailing: Text(
                     batches[index]["date"]!,
@@ -198,5 +250,3 @@ class BatchesPage extends ConsumerWidget {
     );
   }
 }
-
-// File: arrival_data_page.dart

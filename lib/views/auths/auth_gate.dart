@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/views/auths/login_or_register.dart';
+import 'package:myapp/views/pages/batch_select.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';
-import 'package:myapp/views/pages/home_page.dart';
+// import 'package:myapp/views/pages/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPage extends StatelessWidget {
@@ -38,7 +39,7 @@ class AuthPage extends StatelessWidget {
 
               // If logged in, go to the home page
               if (snapshot.hasData) {
-                return const HomePage();
+                return const BatchSelectionPage();
               }
 
               // If not logged in, go to the login page

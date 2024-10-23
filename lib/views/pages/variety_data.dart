@@ -104,7 +104,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
 
     for (var form in _varietyForms) {
       final varietyData = {
-        'batch_id': 1, // Replace with actual batch ID
+        'batch_id': 26, // Replace with actual batch ID
         'variety_name': form['variety']!.text,
         'quantity': int.tryParse(form['quantity']!.text) ?? 0,
         'mortality': int.tryParse(form['mortality']!.text) ?? 0,

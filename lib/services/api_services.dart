@@ -13,7 +13,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   final AuthService authService;
   static const String baseUrl =
-      'https://2b18-102-176-94-41.ngrok-free.app'; // Use your Ngrok URL
+      'https://7dea-154-161-147-241.ngrok-free.app'; // Use your Ngrok URL
 
   ApiService(this.authService);
 
@@ -50,6 +50,8 @@ class ApiService {
       print('Error during batch creation: $e');
     }
   }
+
+  // Method to get all batches from API
 
   Future<List<Batch>> getBatches() async {
     String? firebaseToken = await authService.getIdToken();
@@ -427,7 +429,7 @@ class ApiService {
       return false;
     }
 
-    final url = Uri.parse('$baseUrl/secon_accl/add_second_acclimatization');
+    final url = Uri.parse('$baseUrl/secondAccl/add_second_acclimatization');
     try {
       final response = await http.post(
         url,
@@ -448,6 +450,40 @@ class ApiService {
       }
     } catch (e) {
       print('Error submitting second acclimatization data: $e');
+      return false;
+    }
+  }
+
+  // Method to add a new cut record
+  Future<bool> addCutRecord(Map<String, dynamic> cutData) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/greenhouse_cut/add_cut_record');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(cutData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Cut record added successfully.');
+        return true;
+      } else {
+        print('Failed to add cut record. Status code: ${response.statusCode}');
+        print('Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error adding cut record: $e');
       return false;
     }
   }

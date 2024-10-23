@@ -107,7 +107,10 @@ class _SecondAcclimatizationPageState
       final acclimatizationData = {
         'variety_id': varietyId, // Send the variety_id, not the name
         'date': form['date']!.text, // Date of acclimatization
-        'mortality': int.tryParse(form['mortality']!.text) ?? 0, // Mortality
+        'mortality': int.tryParse(form['mortality']!.text) ?? 0,
+        'quantity': int.tryParse(form['quantity']!.text) ?? 0,
+
+        /// Mortality
       };
 
       try {
@@ -146,17 +149,17 @@ class _SecondAcclimatizationPageState
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("What's Next?"),
+          title: const Text("Continue with Cutting?"),
           content: const Text(
-              "Would you like to finish the process or do it later?"),
+              "Would you like to continue with the cutting process or continue later?"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 // Navigate to the home page
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/firstCut');
               },
-              child: const Text("Finish"),
+              child: const Text("Continue with cutting"),
             ),
             TextButton(
               onPressed: () {
@@ -230,7 +233,13 @@ class _SecondAcclimatizationPageState
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Save'),
+                        : Text(
+                            'Save',
+                            style: AppConstants.subtitleTextStyle.copyWith(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
                   ),
                   ElevatedButton(
                     onPressed: _addAcclimatizationForm,

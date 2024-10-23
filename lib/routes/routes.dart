@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:myapp/views/auths/auth_gate.dart';
 import 'package:myapp/views/auths/login_page.dart';
 import 'package:myapp/views/auths/register_page.dart';
+import 'package:myapp/views/pages/batch_select.dart';
 import 'package:myapp/views/pages/first_acclimatization_page.dart';
 import 'package:myapp/views/pages/arrival_data.dart';
 import 'package:myapp/views/pages/existing_batch_page.dart';
+import 'package:myapp/views/pages/first_cut_page.dart';
 import 'package:myapp/views/pages/get_started_page.dart';
+import 'package:myapp/views/pages/green_house.dart';
 import 'package:myapp/views/pages/home_page.dart';
 import 'package:myapp/views/pages/new_batch.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';
@@ -24,11 +27,15 @@ class Routes {
       '/register': (context) => const RegisterPage(),
       '/profile': (context) => const ProfilePage(),
       '/newBatch': (context) => const NewBatchScreen(),
-      '/existBatches': (context) => BatchesPage(),
+      '/existBatches': (context) => const BatchesPage(),
       '/arrivalData': (context) => const ArrivalDataPage(),
       '/varietyData': (context) => const VarietyDetailsPage(),
       '/addAcclimatization': (context) => const AcclimatizationPage(),
       '/secondAcclimatization': (context) => const SecondAcclimatizationPage(),
+      '/greenHouse': (context) => const GreenhousePage(),
+      '/firstCut': (context) => const FirstCutPage(),
+      '/batchSelect': (context) => const BatchSelectionPage(),
+
 
       // Add other routes here
     };
