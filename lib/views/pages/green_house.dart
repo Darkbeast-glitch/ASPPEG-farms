@@ -239,13 +239,13 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.brown,
+                  backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
                   ),
                 ),
                 child: Text(
-                  "Make a cut",
+                  "Make a Cut",
                   style: AppConstants.subtitleTextStyle.copyWith(
                     color: Colors.white,
                     fontSize: 10,

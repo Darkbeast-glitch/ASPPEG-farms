@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/utils/constants.dart';
+import 'package:animate_do/animate_do.dart';
 
 class AcclimatizationPage extends ConsumerStatefulWidget {
   const AcclimatizationPage({super.key});
@@ -13,38 +14,51 @@ class AcclimatizationPage extends ConsumerStatefulWidget {
 
 class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
   final List<Map<String, TextEditingController>> _acclimatizationForms = [];
-  List<Map<String, dynamic>> _availableVarieties =
-      []; // Store ID and variety data
+  List<Map<String, dynamic>> _availableVarieties = [];
   bool _isLoading = false;
   bool _isLoadingVarietyData = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchAvailableVarieties(); // Fetch varieties when the page loads
-    _addAcclimatizationForm(); // Add the first form
+    _fetchAvailableVarieties();
+    _addAcclimatizationForm();
   }
 
   // Fetch varieties from the existing endpoint
-  void _fetchAvailableVarieties() async {
+  Future<void> _fetchAvailableVarieties() async {
     final apiService = ref.read(apiServiceProvider);
+
     setState(() {
       _isLoadingVarietyData = true;
     });
 
-    // Fetch varieties from the existing endpoint
-    final varieties = await apiService
-        .getVarietyData(); // Use your existing variety fetching endpoint
-    setState(() {
-      _availableVarieties = varieties
-          .map((variety) => {
-                'name': variety['variety_name'],
-                'total_left': variety['total_left'],
-                'id': variety['id']
-              })
-          .toList();
-      _isLoadingVarietyData = false;
-    });
+    try {
+      // Fetch varieties from the existing endpoint
+      final varieties = await apiService.getVarietyData();
+
+      // Ensure the API response is valid and contains the expected structure
+      setState(() {
+        _availableVarieties = varieties
+            .map((variety) => {
+                  'name': variety['variety_name'],
+                  'total_left': variety['total_left'],
+                  'id': variety['id']
+                })
+            .toList();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching varieties: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoadingVarietyData = false;
+      });
+    }
   }
 
   // Add a new set of forms for additional acclimatization entries
@@ -91,26 +105,19 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
     final apiService = ref.read(apiServiceProvider);
 
     for (var form in _acclimatizationForms) {
-      // Fetch the variety_id based on the selected variety name
-      final varietyId =
-          _getVarietyId(form['variety']!.text); // Get the correct variety_id
+      final varietyId = _getVarietyId(form['variety']!.text);
 
-      // Prepare the correct data payload
       final acclimatizationData = {
-        'variety_id': varietyId, // integer
-        'date': form['date']!.text, // string in ISO 8601 format
-        'mortality': int.tryParse(form['mortality']!.text) ?? 0, // integer
-        'transplanting_date':
-            form['transplantingDate']!.text, // string in ISO 8601 format
-        'quantity': int.tryParse(form['quantity']!.text) ??
-            0, // integer (derived from total_left)
+        'variety_id': varietyId,
+        'date': form['date']!.text,
+        'mortality': int.tryParse(form['mortality']!.text) ?? 0,
+        'transplanting_date': form['transplantingDate']!.text,
+        'quantity': int.tryParse(form['quantity']!.text) ?? 0,
       };
 
       try {
-        // Call the API to add acclimatization data
         await apiService.addAcclimatization(acclimatizationData);
       } catch (e) {
-        // If an error occurs, display a snack bar with the error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
@@ -124,7 +131,6 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
       _isLoading = false;
     });
 
-    // Show a success SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Acclimatization data saved successfully.'),
@@ -132,11 +138,9 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
       ),
     );
 
-    // After success, show the dialog
     _showNextStepDialog();
   }
 
-  // Dialog to ask the user what they want to do next
   void _showNextStepDialog() {
     showDialog(
       context: context,
@@ -148,16 +152,14 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Navigate to the 2nd Acclimatization page (replace with your actual route)
+                Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/secondAcclimatization');
               },
               child: const Text("2nd Acclimatization"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Navigate to the home page (replace with your actual route)
+                Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/home');
               },
               child: const Text("Do it Later"),
@@ -173,78 +175,121 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
+        elevation: 0,
         title: Text(
           '1st Acclimatization',
-          style: AppConstants.titleTextStyle
-              .copyWith(color: Colors.white, fontSize: 17),
+          style: AppConstants.titleTextStyle.copyWith(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: AppConstants.backgroundColor,
         centerTitle: true,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Before Transplanting",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                  fontFamily: "Product Sans Regular",
+              FadeInDown(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Before Transplanting",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Product Sans Bold",
+                        ),
+                      ),
+                      const Gap(4),
+                      Text(
+                        "Add all data for acclimatization before the transplant and proceed.",
+                        style: AppConstants.subtitleTextStyle.copyWith(
+                          color: Colors.green,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Text(
-                  "Add all data for acclimatization before the transplant and proceed.",
-                  style: AppConstants.subtitleTextStyle.copyWith(
-                    color: Colors.green,
-                    fontSize: 10,
-                  )),
               const Gap(20),
-              _isLoadingVarietyData
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _acclimatizationForms.length,
-                      itemBuilder: (context, index) {
-                        return _buildAcclimatizationForm(index);
-                      },
-                    ),
+              Expanded(
+                child: _isLoadingVarietyData
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.green,
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _acclimatizationForms.length,
+                        itemBuilder: (context, index) {
+                          return FadeInUp(
+                            delay: Duration(milliseconds: 100 * index),
+                            child: _buildAcclimatizationForm(index),
+                          );
+                        },
+                      ),
+              ),
               const Gap(20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _saveAcclimatizationData,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+              FadeInUp(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _saveAcclimatizationData,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text('Save Data',
+                                style: AppConstants.subtitleTextStyle.copyWith(
+                                    color: Colors.white, fontSize: 15)),
+                      ),
                     ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Save'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _addAcclimatizationForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow[700],
+                    const Gap(12),
+                    ElevatedButton(
+                      onPressed: _addAcclimatizationForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.yellow[700],
+                        padding: const EdgeInsets.all(16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Icon(Icons.add, color: Colors.white),
                     ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.add_circle_outline),
-                        SizedBox(width: 5),
-                        Text('Add more'),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -254,73 +299,233 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
   }
 
   Widget _buildAcclimatizationForm(int index) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Acclimatization Entry ${index + 1}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              fontFamily: "Product Sans Bold",
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Gap(10),
-          _buildDatePicker(
-            label: "Date",
-            controller: _acclimatizationForms[index]['date']!,
-          ),
-          const Gap(10),
-          _buildDropdown(
-            label: "Add variety",
-            value: _acclimatizationForms[index]['variety']!.text.isNotEmpty
-                ? _acclimatizationForms[index]['variety']!.text
-                : null,
-            items: _availableVarieties,
-            onChanged: (value) {
-              // When variety is selected, fetch its total_left and set it in the quantity field
-              setState(() {
-                _acclimatizationForms[index]['variety']!.text = value ?? '';
-                final selectedVariety = _availableVarieties.firstWhere(
-                    (variety) => variety['name'] == value,
-                    orElse: () => {});
-                _acclimatizationForms[index]['quantity']!.text =
-                    selectedVariety['total_left'].toString();
-                _calculateTotalLeft(index);
-              });
-            },
-          ),
-          const Gap(10),
-          _buildTextField(
-            label: "Quantity Of variety",
-            controller: _acclimatizationForms[index]['quantity']!,
-            keyboardType: TextInputType.number,
-            onChanged: () => _calculateTotalLeft(index),
-          ),
-          const Gap(10),
-          _buildTextField(
-            label: "Mortality (Optional)",
-            controller: _acclimatizationForms[index]['mortality']!,
-            keyboardType: TextInputType.number,
-            onChanged: () => _calculateTotalLeft(index),
-          ),
-          const Gap(10),
-          _buildDatePicker(
-            label: "Transplanting Date",
-            controller: _acclimatizationForms[index]['transplantingDate']!,
-          ),
-          const Gap(10),
-          _buildTextField(
-            label: "Total Left",
-            controller: _acclimatizationForms[index]['totalLeft']!,
-            enabled: false,
-            onChanged: () {},
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.grey[850],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
+      child: ExpansionTile(
+        initiallyExpanded: true,
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${index + 1}',
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Gap(12),
+            Text(
+              'Acclimatization Entry ${index + 1}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontFamily: "Product Sans Bold",
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDatePicker(
+                  label: "Date",
+                  controller: _acclimatizationForms[index]['date']!,
+                  icon: Icons.event,
+                ),
+                const Gap(16),
+                _buildDropdown(
+                  label: "Select Variety",
+                  value:
+                      _acclimatizationForms[index]['variety']!.text.isNotEmpty
+                          ? _acclimatizationForms[index]['variety']!.text
+                          : null,
+                  items: _availableVarieties,
+                  onChanged: (value) {
+                    setState(() {
+                      _acclimatizationForms[index]['variety']!.text =
+                          value ?? '';
+                      final selectedVariety = _availableVarieties.firstWhere(
+                        (variety) => variety['name'] == value,
+                        orElse: () => {},
+                      );
+                      _acclimatizationForms[index]['quantity']!.text =
+                          selectedVariety['total_left'].toString();
+                      _calculateTotalLeft(index);
+                    });
+                  },
+                ),
+                const Gap(16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        label: "Quantity",
+                        controller: _acclimatizationForms[index]['quantity']!,
+                        keyboardType: TextInputType.number,
+                        onChanged: () => _calculateTotalLeft(index),
+                        icon: Icons.numbers,
+                      ),
+                    ),
+                    const Gap(12),
+                    Expanded(
+                      child: _buildTextField(
+                        label: "Mortality",
+                        controller: _acclimatizationForms[index]['mortality']!,
+                        keyboardType: TextInputType.number,
+                        onChanged: () => _calculateTotalLeft(index),
+                        icon: Icons.remove_circle_outline,
+                      ),
+                    ),
+                  ],
+                ),
+                const Gap(16),
+                _buildDatePicker(
+                  label: "Transplanting Date",
+                  controller: _acclimatizationForms[index]
+                      ['transplantingDate']!,
+                  icon: Icons.calendar_today,
+                ),
+                const Gap(16),
+                _buildTextField(
+                  label: "Total Left",
+                  controller: _acclimatizationForms[index]['totalLeft']!,
+                  enabled: false,
+                  onChanged: () {},
+                  icon: Icons.analytics_outlined,
+                ),
+                if (_acclimatizationForms.length > 1)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _acclimatizationForms.removeAt(index);
+                        });
+                      },
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      label: const Text(
+                        'Remove Entry',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    bool enabled = true,
+    required Function() onChanged,
+    TextInputType keyboardType = TextInputType.text,
+    IconData? icon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[800],
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white60),
+        prefixIcon: Icon(icon, color: Colors.white60),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[700]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.green),
+        ),
+      ),
+      enabled: enabled,
+      onChanged: (_) => onChanged(),
+    );
+  }
+
+  Widget _buildDatePicker({
+    required String label,
+    required TextEditingController controller,
+    IconData? icon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[800],
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white60),
+        prefixIcon: Icon(icon, color: Colors.white60),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[700]!),
+        ),
+      ),
+      onTap: () async {
+        final DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: const ColorScheme.dark(
+                  primary: Colors.green,
+                  onPrimary: Colors.white,
+                  surface: Color(0xFF303030),
+                  onSurface: Colors.white,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+        if (pickedDate != null) {
+          setState(() {
+            controller.text = pickedDate.toIso8601String().split('T').first;
+          });
+        }
+      },
     );
   }
 
@@ -335,77 +540,34 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
       items: items.map((Map<String, dynamic> item) {
         return DropdownMenuItem<String>(
           value: item['name'],
-          child:
-              Text(item['name'], style: const TextStyle(color: Colors.black)),
+          child: Text(
+            item['name'],
+            style: const TextStyle(color: Colors.white),
+          ),
         );
       }).toList(),
       onChanged: onChanged,
+      dropdownColor: Colors.grey[850],
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.grey[700],
-        hintText: label,
-        hintStyle: const TextStyle(color: Colors.white60),
+        fillColor: Colors.grey[800],
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white60),
+        prefixIcon: const Icon(Icons.local_florist, color: Colors.white60),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[700]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.green),
         ),
       ),
       style: const TextStyle(color: Colors.white),
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    bool enabled = true,
-    required Function()? onChanged,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[700],
-        hintText: label,
-        hintStyle: const TextStyle(color: Colors.white60),
-        border: const OutlineInputBorder(),
-      ),
-      enabled: enabled,
-      onChanged: (_) => onChanged!(),
-    );
-  }
-
-  Widget _buildDatePicker({
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[700],
-        hintText: label,
-        hintStyle: const TextStyle(color: Colors.white60),
-        border: const OutlineInputBorder(),
-        suffixIcon: const Icon(Icons.calendar_today, color: Colors.white60),
-      ),
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (pickedDate != null) {
-          setState(() {
-            controller.text = pickedDate.toIso8601String().split('T').first;
-          });
-        }
-      },
     );
   }
 }

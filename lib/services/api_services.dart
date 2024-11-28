@@ -13,7 +13,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   final AuthService authService;
   static const String baseUrl =
-      'https://7dea-154-161-147-241.ngrok-free.app'; // Use your Ngrok URL
+      'https://3021-154-161-50-18.ngrok-free.app'; // Use your Ngrok URL
 
   ApiService(this.authService);
 
@@ -201,7 +201,46 @@ class ApiService {
     }
   }
 
-  // Method to add variety data
+  // this method uploads Variety
+  Future<String?> uploadVarietyImage(File imageFile) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return null;
+    }
+
+    final uri = Uri.parse('$baseUrl/variety/upload_variety_image');
+    var request = http.MultipartRequest('POST', uri);
+
+    // Add authorization header
+    request.headers['Authorization'] = 'Bearer $firebaseToken';
+
+    // Add the file to the request
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+      ),
+    );
+
+    try {
+      var response = await request.send();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = await response.stream.bytesToString();
+        final Map<String, dynamic> jsonResponse = jsonDecode(responseData);
+        return jsonResponse['image_url'];
+      } else {
+        print(
+            'Failed to upload variety image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error uploading variety image: $e');
+      return null;
+    }
+  }
+
+// Update the existing addVarietyData method to include image_url
   Future<bool> addVarietyData(Map<String, dynamic> varietyData) async {
     final uri = Uri.parse('$baseUrl/variety/add_variety_data');
     String? firebaseToken = await authService.getIdToken();
@@ -223,15 +262,16 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Variety data added successfully.');
-        return true; // Successful addition
+        return true;
       } else {
         print(
             'Failed to add variety data. Status code: ${response.statusCode}');
-        return false; // Failure in addition
+        print('Response body: ${response.body}');
+        return false;
       }
     } catch (e) {
       print('Error adding variety data: $e');
-      return false; // Error occurred
+      return false;
     }
   }
 

@@ -171,14 +171,14 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const SizedBox(height: 16),
             BatchButton(
-              text: "Start New Batch",
+              text: "Start Process",
               icon: const Icon(
                 Icons.add_circle_rounded,
                 color: Colors.white,
                 size: 20,
               ),
               onTap: () {
-                Navigator.pushNamed(context, "/batchSelect");
+                Navigator.pushNamed(context, "/arrivalData");
               },
             ),
             const Gap(10),
@@ -344,8 +344,132 @@ class _HomePageState extends ConsumerState<HomePage> {
               color: Colors.black87,
             ),
           ),
-          // Other drawer items here
-          // ...
+          // Adding the drawer items back properly
+          ListTile(
+            leading: const Icon(
+              Icons.ac_unit,
+              color: Colors.white,
+              size: 20,
+            ),
+            title: const Text(
+              "1 Acclimatization",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/addAcclimatization"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.ac_unit_outlined, color: Colors.white),
+            title: const Text(
+              "2 Acclimatization",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/secondAcclimatization"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.eco, color: Colors.white),
+            title: const Text(
+              "1st Cut Records",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/firstCut"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.eco, color: Colors.white),
+            title: const Text(
+              "Greenhouse",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/greenHouse"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.grass, color: Colors.white),
+            title: const Text(
+              "1st Reproduction",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/firstReproduction"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.grass_outlined, color: Colors.white),
+            title: const Text(
+              "2nd Reproduction",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/secondReproduction"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.forest, color: Colors.white),
+            title: const Text(
+              "Production",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/production"),
+          ),
+          const Divider(color: Colors.white),
+          ListTile(
+            leading: const Icon(Icons.settings, color: Colors.white),
+            title: const Text(
+              "Settings",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/settings"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.help, color: Colors.white),
+            title: const Text(
+              "Help/Guide",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/help"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.white),
+            title: const Text(
+              "Log out",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/logout"),
+          ),
         ],
       ),
     );
