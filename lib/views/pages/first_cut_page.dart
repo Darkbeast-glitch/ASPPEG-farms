@@ -231,7 +231,7 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed:
-                        _isLoading ? null : () => _handleCutSubmission(43),
+                        _isLoading ? null : () => _handleCutSubmission(1),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -328,7 +328,7 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
 
     final cutData = {
       'variety_id': varietyId,
-      'second_acclimatization_id': 10,
+      'second_acclimatization_id': 1,
       'quantity_cut': quantityCut,
       'date': date,
       'week': week,

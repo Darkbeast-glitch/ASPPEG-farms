@@ -12,8 +12,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 
 class ApiService {
   final AuthService authService;
-  static const String baseUrl =
-      'https://3021-154-161-50-18.ngrok-free.app'; // Use your Ngrok URL
+  static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
 
   ApiService(this.authService);
 

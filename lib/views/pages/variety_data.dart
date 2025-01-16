@@ -138,7 +138,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
         }
 
         final varietyData = {
-          'batch_id': 35, // This will be replaced later with actual batch ID
+          'batch_id': 1, // This will be replaced later with actual batch ID
           'variety_name': (form['variety'] as TextEditingController).text,
           'quantity':
               int.parse((form['quantity'] as TextEditingController).text),
@@ -150,7 +150,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
 
         final success = await apiService.addVarietyData(varietyData);
         if (!success) {
-          throw Exception('Failed to save variety data');
+          throw Exception('Variety Already exist');
         }
       }
 
