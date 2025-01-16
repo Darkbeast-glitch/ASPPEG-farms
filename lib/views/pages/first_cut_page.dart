@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/utils/constants.dart';
+import 'package:gap/gap.dart';
+import 'package:animate_do/animate_do.dart';
 
 class FirstCutPage extends ConsumerStatefulWidget {
   const FirstCutPage({super.key});
@@ -20,9 +22,18 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
       TextEditingController();
   final TextEditingController _totalLeftController = TextEditingController();
   final TextEditingController _cuttingDoneController =
-      TextEditingController(text: "1"); // Default to 1
+      TextEditingController(text: "1");
 
-  bool _isLoading = false; // Track API request state
+  List<Map<String, dynamic>> _availableVarieties = [];
+  Map<String, dynamic>? _selectedVariety;
+  bool _isLoading = false;
+  bool _isLoadingVarieties = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAvailableVarieties();
+  }
 
   @override
   void dispose() {
@@ -37,111 +48,265 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
     super.dispose();
   }
 
+  // Fetch varieties from the API
+  Future<void> _fetchAvailableVarieties() async {
+    final apiService = ref.read(apiServiceProvider);
+
+    try {
+      final varieties = await apiService.getVarietyData();
+      setState(() {
+        _availableVarieties = varieties
+            .map((variety) => {
+                  'id': variety['id'],
+                  'name': variety['variety_name'],
+                  'quantity': variety['quantity'] ??
+                      0, // Ensure quantity has a default value if null
+                })
+            .toList();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Error fetching varieties: $e'),
+            backgroundColor: Colors.red),
+      );
+    } finally {
+      setState(() {
+        _isLoadingVarieties = false;
+      });
+    }
+  }
+
+  void _onVarietySelected(Map<String, dynamic> variety) {
+    setState(() {
+      _selectedVariety = variety;
+      _quantityController.text =
+          variety['quantity']?.toString() ?? '0'; // Safely handle null values
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final arguments =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final varietyId =
-        arguments?['id'] ?? 0; // Get the variety ID or default to 0
-    final varietyName =
-        arguments?['name'] ?? 'Unknown Variety'; // Get the variety name
-    final quantity = arguments?['quantity'] ?? 0; // Get the quantity
-
-    _quantityController.text = quantity.toString();
+    final varietyId = arguments?['id'] ?? 0;
 
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
+        elevation: 0,
         title: Text(
-          'Take Cut Records',
-          style: AppConstants.titleTextStyle
-              .copyWith(color: Colors.white, fontSize: 17),
+          'First Cut Records',
+          style: AppConstants.titleTextStyle.copyWith(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        centerTitle: true,
         backgroundColor: AppConstants.backgroundColor,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTextField(
-                label: "Variety",
-                initialValue: varietyName,
-                enabled: false,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: "Quantity",
-                controller: _quantityController,
-                enabled: false,
-              ),
-              const SizedBox(height: 16),
-              _buildDatePicker(
-                label: "Date",
-                controller: _dateController,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: "Week (Auto-generate based on date)",
-                controller: _weekController,
-                enabled: false,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: "Quantity Cut",
-                controller: _quantityCutController,
-                keyboardType: TextInputType.number,
-                onChanged: _calculateTotalLeft,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: "Reproduction Rate (total_left / quantity)",
-                controller: _reproductionRateController,
-                enabled: false,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: "Mortality (Optional)",
-                controller: _mortalityController,
-                keyboardType: TextInputType.number,
-                onChanged: _calculateTotalLeft,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: "Total Left (Quantity Cut - Mortality)",
-                controller: _totalLeftController,
-                enabled: false,
-              ),
-              const SizedBox(height: 16),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: () => _handleCutSubmission(varietyId),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      child: Text(
-                        'Choose Field Details for this cut',
-                        style: AppConstants.subtitleTextStyle.copyWith(
+              FadeInDown(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Cutting Process",
+                        style: TextStyle(
+                          fontSize: 16,
                           color: Colors.white,
-                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Product Sans Bold",
                         ),
                       ),
+                      const Gap(4),
+                      Text(
+                        "Record the details of your first cut for tracking and analysis.",
+                        style: AppConstants.subtitleTextStyle.copyWith(
+                          color: Colors.green,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Gap(20),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: FadeInUp(
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[850],
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildVarietyDropdown(),
+                          const Gap(16),
+                          _buildTextField(
+                            label: "Initial Quantity",
+                            controller: _quantityController,
+                            enabled: false,
+                            icon: Icons.inventory,
+                          ),
+                          const Gap(16),
+                          _buildDatePicker(
+                            label: "Cut Date",
+                            controller: _dateController,
+                            icon: Icons.event,
+                          ),
+                          const Gap(16),
+                          _buildTextField(
+                            label: "Week",
+                            controller: _weekController,
+                            enabled: false,
+                            icon: Icons.calendar_view_week,
+                          ),
+                          const Gap(16),
+                          _buildTextField(
+                            label: "Quantity Cut",
+                            controller: _quantityCutController,
+                            keyboardType: TextInputType.number,
+                            onChanged: _calculateTotalLeft,
+                            icon: Icons.content_cut,
+                          ),
+                          const Gap(16),
+                          _buildTextField(
+                            label: "Reproduction Rate",
+                            controller: _reproductionRateController,
+                            enabled: false,
+                            icon: Icons.trending_up,
+                          ),
+                          const Gap(16),
+                          _buildTextField(
+                            label: "Mortality",
+                            controller: _mortalityController,
+                            keyboardType: TextInputType.number,
+                            onChanged: _calculateTotalLeft,
+                            icon: Icons.remove_circle_outline,
+                          ),
+                          const Gap(16),
+                          _buildTextField(
+                            label: "Total Left",
+                            controller: _totalLeftController,
+                            enabled: false,
+                            icon: Icons.analytics_outlined,
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                ),
+              ),
+              const Gap(20),
+              FadeInUp(
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed:
+                        _isLoading ? null : () => _handleCutSubmission(1),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Save Cut Details',
+                            style: AppConstants.subtitleTextStyle.copyWith(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildVarietyDropdown() {
+    return _isLoadingVarieties
+        ? const Center(child: CircularProgressIndicator())
+        : DropdownButtonFormField<Map<String, dynamic>>(
+            value: _selectedVariety,
+            items: _availableVarieties.map((variety) {
+              return DropdownMenuItem<Map<String, dynamic>>(
+                value: variety,
+                child: Text(
+                  variety['name'],
+                  style: const TextStyle(color: Colors.white),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                _onVarietySelected(value);
+              }
+            },
+            dropdownColor: Colors.grey[850],
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[800],
+              labelText: "Select Variety",
+              labelStyle: const TextStyle(color: Colors.white60),
+              prefixIcon:
+                  const Icon(Icons.local_florist, color: Colors.white60),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[700]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.green),
+              ),
+            ),
+            style: const TextStyle(color: Colors.white),
+          );
   }
 
   Future<void> _handleCutSubmission(int varietyId) async {
@@ -163,6 +328,7 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
 
     final cutData = {
       'variety_id': varietyId,
+      'second_acclimatization_id': 1,
       'quantity_cut': quantityCut,
       'date': date,
       'week': week,
@@ -244,6 +410,7 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
     required String label,
     TextEditingController? controller,
     bool enabled = true,
+    final IconData? icon,
     String? initialValue,
     TextInputType keyboardType = TextInputType.text,
     Function()? onChanged,
@@ -273,6 +440,7 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
 
   Widget _buildDatePicker({
     required String label,
+    final IconData? icon,
     required TextEditingController controller,
   }) {
     return TextFormField(
@@ -324,4 +492,5 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
         totalLeft > 0 ? (totalLeft / quantity).toStringAsFixed(2) : "0.00";
     _reproductionRateController.text = reproductionRate;
   }
+  // Other methods and widgets remain unchanged...
 }

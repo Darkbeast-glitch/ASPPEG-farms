@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -75,7 +74,7 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
 
     // Step 2: Prepare arrival data and submit to the backend
     Map<String, dynamic> arrivalData = {
-      "batch_id": 26, // Replace with the actual batch ID or get it dynamically
+      "batch_id": 1, // Replace with the actual batch ID or get it dynamically
       "quantity_of_plant_arrived": int.tryParse(quantityController.text) ?? 0,
       "date_of_arrival": dateController.text,
       "mortality_rate": int.tryParse(mortalityController.text) ?? 0,

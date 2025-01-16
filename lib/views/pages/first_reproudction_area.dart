@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/utils/constants.dart';
 
-class GreenhousePage extends ConsumerStatefulWidget {
-  const GreenhousePage({super.key});
+class FirstReproudctionArea extends ConsumerStatefulWidget {
+  const FirstReproudctionArea({super.key});
 
   @override
-  _GreenhousePageState createState() => _GreenhousePageState();
+  _FirstReproudctionAreaState createState() => _FirstReproudctionAreaState();
 }
 
-class _GreenhousePageState extends ConsumerState<GreenhousePage> {
+class _FirstReproudctionAreaState extends ConsumerState<FirstReproudctionArea> {
   List<Map<String, dynamic>> _varietyData = [];
   bool _isLoading = true;
 
@@ -53,7 +53,7 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
         backgroundColor: AppConstants.backgroundColor,
         appBar: AppBar(
           title: Text(
-            'GreenHouse',
+            'Frist Reproudction Area',
             style: AppConstants.titleTextStyle
                 .copyWith(color: Colors.white, fontSize: 17),
           ),
@@ -192,7 +192,8 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
             ),
             const SizedBox(height: 2),
             Text(
-              'Mortality:               ${variety['mortality']}',
+              // TO
+              'Plot Number:               ${variety['plotnumber']}', 
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,

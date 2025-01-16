@@ -3,6 +3,7 @@ import 'package:myapp/views/auths/auth_gate.dart';
 import 'package:myapp/views/auths/login_page.dart';
 import 'package:myapp/views/auths/register_page.dart';
 import 'package:myapp/views/pages/batch_select.dart';
+import 'package:myapp/views/pages/field_details_first_repro.dart';
 import 'package:myapp/views/pages/first_acclimatization_page.dart';
 import 'package:myapp/views/pages/arrival_data.dart';
 import 'package:myapp/views/pages/existing_batch_page.dart';
@@ -35,6 +36,7 @@ class Routes {
       '/greenHouse': (context) => const GreenhousePage(),
       '/firstCut': (context) => const FirstCutPage(),
       '/batchSelect': (context) => const BatchSelectionPage(),
+      '/fieldDetails': (context) => const FieldDetailsPage(),
 
 
       // Add other routes here
