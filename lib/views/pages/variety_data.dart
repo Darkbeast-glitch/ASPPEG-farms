@@ -225,7 +225,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white,),
         ),
       ),
       body: Padding(

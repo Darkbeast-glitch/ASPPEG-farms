@@ -8,6 +8,8 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 
+
+
 class OnboardingPage extends ConsumerWidget {
   const OnboardingPage({super.key});
 
@@ -19,12 +21,14 @@ class OnboardingPage extends ConsumerWidget {
         context, '/auth'); // Navigate to login/auth page
   }
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Initialize the PageController within the build method
     final currentPage = ref.watch(currentPageProvider);
     final controller = PageController(initialPage: currentPage);
     final screenWidth = MediaQuery.of(context).size.width;
+    bool isLoggedIn = false;
 
     return Scaffold(
       body: SafeArea(
@@ -53,32 +57,32 @@ class OnboardingPage extends ConsumerWidget {
             ),
 
             // Welcome and Skip row
-            const Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Welcome",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Product Sans Regular',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    "Skip",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Product Sans Regular',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // const Padding(
+            //   padding: EdgeInsets.all(15.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Text(
+            //         "Welcome",
+            //         style: TextStyle(
+            //           color: Colors.white,
+            //           fontFamily: 'Product Sans Regular',
+            //           fontSize: 16,
+            //           fontWeight: FontWeight.w400,
+            //         ),
+            //       ),
+            //       Text(
+            //         "Skip",
+            //         style: TextStyle(
+            //           color: Colors.white,
+            //           fontFamily: 'Product Sans Regular',
+            //           fontSize: 16,
+            //           fontWeight: FontWeight.w400,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // App title text
             Padding(
@@ -164,7 +168,20 @@ class OnboardingPage extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const MyButton(text: "Login"),
+                    isLoggedIn 
+                      // ignore: dead_code
+                      ? MyButton(
+                        text: "Home",
+                        onTap: () {
+                        Navigator.pushNamed(context, '/home');
+                        },
+                      )
+                      : MyButton(
+                        text: "Login",
+                        onTap: () {
+                        Navigator.pushNamed(context, '/login');
+                        },
+                      ),
                   MyButton(
                     text: currentPage == pageCount - 1 ? "Get started" : "Next",
                     onTap: () {

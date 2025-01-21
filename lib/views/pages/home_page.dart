@@ -422,6 +422,30 @@ class _HomePageState extends ConsumerState<HomePage> {
             onTap: () => Navigator.pushNamed(context, "/secondReproduction"),
           ),
           ListTile(
+            leading: const Icon(Icons.grass_outlined, color: Colors.white),
+            title: const Text(
+              "1st Field Detials",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/fieldDetails"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.grass_outlined, color: Colors.white),
+            title: const Text(
+              "2nd Field Detials",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/secondReproduction"),
+          ),
+          ListTile(
             leading: const Icon(Icons.forest, color: Colors.white),
             title: const Text(
               "Production",

@@ -226,40 +226,51 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
                 ),
               ),
               const Gap(20),
-              FadeInUp(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed:
-                        _isLoading ? null : () => _handleCutSubmission(1),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            'Save Cut Details',
-                            style: AppConstants.subtitleTextStyle.copyWith(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          ),
-                  ),
-                ),
+             const Gap(20),
+FadeInUp(
+  child: SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: _isLoading ? null : _handleCutSubmission,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      child: _isLoading
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
               ),
+            )
+          : Text(
+              'Save Cut Details',
+              style: AppConstants.subtitleTextStyle.copyWith(
+                color: Colors.white,
+                fontSize: 15,
+              ),
+            ),
+    ),
+  ),
+),
             ],
           ),
+        ),
+      ),
+       floatingActionButton: SizedBox(
+        width: 40,
+        height: 40,
+        child: FloatingActionButton(
+          onPressed: () {
+        Navigator.pushNamed(context, '/home');
+          },
+          backgroundColor: Colors.white,
+          child: const Icon(Icons.home, size: 30),
         ),
       ),
     );
@@ -309,26 +320,48 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
           );
   }
 
-  Future<void> _handleCutSubmission(int varietyId) async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _handleCutSubmission() async {
+  if (_selectedVariety == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please select a variety.'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-    final apiService = ref.read(apiServiceProvider);
-    final quantityCut = int.tryParse(_quantityCutController.text) ?? 0;
-    final mortality = int.tryParse(_mortalityController.text) ?? 0;
-    final date = _dateController.text;
-    final week = _weekController.text;
-    final totalLeft = quantityCut - mortality;
-    final reproductionRate = totalLeft > 0
-        ? (totalLeft / (int.tryParse(_quantityController.text) ?? 1))
-            .toStringAsFixed(2)
-        : '0.00';
-    const createdBy = 'user_name'; // Replace with actual user name if needed
+  setState(() {
+    _isLoading = true;
+  });
+
+  final apiService = ref.read(apiServiceProvider);
+  final quantityCut = int.tryParse(_quantityCutController.text) ?? 0;
+  final mortality = int.tryParse(_mortalityController.text) ?? 0;
+  final date = _dateController.text;
+  final week = _weekController.text;
+  final totalLeft = quantityCut - mortality;
+  final reproductionRate = totalLeft > 0
+      ? (totalLeft / (int.tryParse(_quantityController.text) ?? 1))
+          .toStringAsFixed(2)
+      : '0.00';
+  const createdBy = 'user_name'; // Replace with actual user name if needed
+
+  try {
+    // Fetch the second_acclimatization_id from the API or relevant data source
+    final secondAcclimatizationData = await apiService.getSecondAcclimatizationData();
+    final secondAcclimatizationId = secondAcclimatizationData.firstWhere(
+      (data) => data['variety_id'] == _selectedVariety!['id'],
+      orElse: () => <String, dynamic>{},
+    )['id'];
+
+    if (secondAcclimatizationId == null) {
+      throw Exception('Second Acclimatization ID not found for variety ID: ${_selectedVariety!['id']}');
+    }
 
     final cutData = {
-      'variety_id': varietyId,
-      'second_acclimatization_id': 1,
+      'variety_id': _selectedVariety!['id'],
+      'second_acclimatization_id': secondAcclimatizationId,
       'quantity_cut': quantityCut,
       'date': date,
       'week': week,
@@ -339,44 +372,42 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
       'total_left': totalLeft,
     };
 
-    try {
-      final success = await apiService.addCutRecord(cutData);
+    final success = await apiService.addCutRecord(cutData);
 
-      setState(() {
-        _isLoading = false;
-      });
+    setState(() {
+      _isLoading = false;
+    });
 
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cut record saved successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        _showNextStepDialog();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to save cut record.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-
+    if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
+        const SnackBar(
+          content: Text('Cut record saved successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      _showNextStepDialog();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to save cut record.'),
           backgroundColor: Colors.red,
         ),
       );
     }
-  }
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+    });
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error: $e'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
   void _showNextStepDialog() {
     showDialog(
       context: context,

@@ -89,6 +89,7 @@ class _FieldDetailsPageState extends ConsumerState<FieldDetailsPage> {
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
+        
         elevation: 0,
         title: Text(
           'Field Details for First\nReproduction Area',
@@ -103,12 +104,12 @@ class _FieldDetailsPageState extends ConsumerState<FieldDetailsPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon:  const Icon(Icons.arrow_back_ios_new, color: Colors.white,),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -211,6 +212,19 @@ class _FieldDetailsPageState extends ConsumerState<FieldDetailsPage> {
               ),
             ],
           ),
+          
+        ),
+        
+      ),
+      floatingActionButton: SizedBox(
+        width: 40,
+        height: 40,
+        child: FloatingActionButton(
+          onPressed: () {
+        Navigator.pushNamed(context, '/home');
+          },
+          backgroundColor: Colors.white,
+          child: const Icon(Icons.home, size: 30),
         ),
       ),
     );

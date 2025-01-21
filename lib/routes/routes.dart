@@ -8,6 +8,7 @@ import 'package:myapp/views/pages/first_acclimatization_page.dart';
 import 'package:myapp/views/pages/arrival_data.dart';
 import 'package:myapp/views/pages/existing_batch_page.dart';
 import 'package:myapp/views/pages/first_cut_page.dart';
+import 'package:myapp/views/pages/first_reproudction_area.dart';
 import 'package:myapp/views/pages/get_started_page.dart';
 import 'package:myapp/views/pages/green_house.dart';
 import 'package:myapp/views/pages/home_page.dart';
@@ -16,6 +17,8 @@ import 'package:myapp/views/pages/onboarding_page.dart';
 import 'package:myapp/views/pages/profile_page.dart';
 import 'package:myapp/views/pages/second_acclimatizaton_page.dart';
 import 'package:myapp/views/pages/variety_data.dart';
+
+import '../views/pages/new_fd_first_repro.dart';
 
 class Routes {
   static Map<String, WidgetBuilder> getRoutes() {
@@ -35,8 +38,12 @@ class Routes {
       '/secondAcclimatization': (context) => const SecondAcclimatizationPage(),
       '/greenHouse': (context) => const GreenhousePage(),
       '/firstCut': (context) => const FirstCutPage(),
+      '/secondCut': (context) => const FirstCutPage(),
       '/batchSelect': (context) => const BatchSelectionPage(),
-      '/fieldDetails': (context) => const FieldDetailsPage(),
+      // '/fieldDetails': (context) => const FieldDetailsPage(),
+      '/fieldDetails': (context) => const NewFieldDetailsPage(),
+      '/firstReproduction': (context) => const FirstReproudctionArea(),
+      '/secondReproduction': (context) => const SecondAcclimatizationPage(),
 
 
       // Add other routes here
