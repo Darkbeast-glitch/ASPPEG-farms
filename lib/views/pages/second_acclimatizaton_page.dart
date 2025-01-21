@@ -135,7 +135,7 @@ class _SecondAcclimatizationPageState
     _showNextStepDialog();
   }
 
-  void _showNextStepDialog() {
+  void _showNextStepDialog() { 
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -154,9 +154,9 @@ class _SecondAcclimatizationPageState
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/greenHouse');
               },
-              child: const Text("Do it Later"),
+              child: const Text("Greenhouse"),
             ),
           ],
         );
@@ -182,7 +182,7 @@ class _SecondAcclimatizationPageState
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white,),
         ),
       ),
       body: SafeArea(
@@ -289,6 +289,8 @@ class _SecondAcclimatizationPageState
           ),
         ),
       ),
+      
+      
     );
   }
 

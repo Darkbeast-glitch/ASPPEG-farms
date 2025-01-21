@@ -526,4 +526,72 @@ class ApiService {
       return false;
     }
   }
+
+
+// Fetch second acclimatization data
+  Future<List<Map<String, dynamic>>> getSecondAcclimatizationData() async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return [];
+    }
+
+    final url = Uri.parse('$baseUrl/secondAccl/all_second_accl');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        print('Failed to fetch second acclimatization data. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching second acclimatization data: $e');
+      return [];
+    }
+  }
+
+  // code to add the Field Details to the first Reproducwtion Area
+  Future<bool> addFieldDetails(Map<String, dynamic> fieldDetails) async {
+    String? firebaseToken = await authService.getIdToken();
+    if(firebaseToken == null){
+      print("Failed to retrieve Firebase Token");
+    }
+
+    final url = Uri.parse('$baseUrl/first_rep/add_first_rep_details');
+
+    try{
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type' : 'application/json',
+          'Authorizatioin' : 'Beareer $firebaseToken',
+        },
+        body:  jsonEncode(fieldDetails)
+      );
+      if (response.statusCode == 200 || response.statusCode == 201){
+        print("Field detials added successfully.");
+        return true;
+      }else{
+        print("Failed to add field details. Status code: ${response.statusCode}");
+        print("Response body : ${response.body}");
+        return false;
+
+      }
+    }catch(e){
+      print('Error adding field details: $e');
+      return false;
+    } 
+
+  }
+
+  
 }
