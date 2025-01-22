@@ -388,6 +388,18 @@ class _HomePageState extends ConsumerState<HomePage> {
           ListTile(
             leading: const Icon(Icons.eco, color: Colors.white),
             title: const Text(
+              "2nd Cut Records",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Product Sans Regular",
+                fontSize: 13,
+              ),
+            ),
+            onTap: () => Navigator.pushNamed(context, "/secondCut"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.eco, color: Colors.white),
+            title: const Text(
               "Greenhouse",
               style: TextStyle(
                 color: Colors.white,
@@ -443,7 +455,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 fontSize: 13,
               ),
             ),
-            onTap: () => Navigator.pushNamed(context, "/secondReproduction"),
+            onTap: () => Navigator.pushNamed(context, "/secfieldDetails"),
           ),
           ListTile(
             leading: const Icon(Icons.forest, color: Colors.white),

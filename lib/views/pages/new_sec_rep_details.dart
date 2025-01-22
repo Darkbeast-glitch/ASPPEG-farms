@@ -5,14 +5,14 @@ import 'package:myapp/utils/constants.dart';
 import 'package:gap/gap.dart';
 import 'package:animate_do/animate_do.dart';
 
-class NewFieldDetailsPage extends ConsumerStatefulWidget {
-  const NewFieldDetailsPage({super.key});
+class NewSecRepDetails extends ConsumerStatefulWidget {
+  const NewSecRepDetails({super.key});
 
   @override
-  _NewFieldDetailsPageState createState() => _NewFieldDetailsPageState();
+  _NewSecRepDetailsState createState() => _NewSecRepDetailsState();
 }
 
-class _NewFieldDetailsPageState extends ConsumerState<NewFieldDetailsPage> {
+class _NewSecRepDetailsState extends ConsumerState<NewSecRepDetails> {
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _plotNumber = TextEditingController();
   final TextEditingController _mortalityController = TextEditingController();
@@ -91,7 +91,7 @@ Widget build(BuildContext context) {
     appBar: AppBar(
       elevation: 0,
       title: Text(
-        'Field Details',
+        '2 Field Details',
         style: AppConstants.titleTextStyle.copyWith(
           color: Colors.white,
           fontSize: 20,
@@ -123,7 +123,7 @@ Widget build(BuildContext context) {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "First Reproduction Area",
+                      "Second Reproduction Area",
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -133,7 +133,7 @@ Widget build(BuildContext context) {
                     ),
                     const Gap(4),
                     Text(
-                      "Record the details for First Reproduction Area",
+                      "Record the details for Second Reproduction Area",
                       style: AppConstants.subtitleTextStyle.copyWith(
                         color: Colors.green,
                         fontSize: 14,
@@ -326,7 +326,7 @@ FadeInUp(
   };
 
   try {
-    final success = await apiService.addFieldDetails(fieldDetails);
+    final success = await apiService.addSecondFieldDetails(fieldDetails);
 
     setState(() {
       _isLoading = false;

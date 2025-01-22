@@ -13,9 +13,11 @@ import 'package:myapp/views/pages/get_started_page.dart';
 import 'package:myapp/views/pages/green_house.dart';
 import 'package:myapp/views/pages/home_page.dart';
 import 'package:myapp/views/pages/new_batch.dart';
+import 'package:myapp/views/pages/new_sec_rep_details.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';
 import 'package:myapp/views/pages/profile_page.dart';
 import 'package:myapp/views/pages/second_acclimatizaton_page.dart';
+import 'package:myapp/views/pages/second_cut_page.dart';
 import 'package:myapp/views/pages/variety_data.dart';
 
 import '../views/pages/new_fd_first_repro.dart';
@@ -38,10 +40,11 @@ class Routes {
       '/secondAcclimatization': (context) => const SecondAcclimatizationPage(),
       '/greenHouse': (context) => const GreenhousePage(),
       '/firstCut': (context) => const FirstCutPage(),
-      '/secondCut': (context) => const FirstCutPage(),
+      '/secondCut': (context) => const SecondCutPage(),
       '/batchSelect': (context) => const BatchSelectionPage(),
       // '/fieldDetails': (context) => const FieldDetailsPage(),
       '/fieldDetails': (context) => const NewFieldDetailsPage(),
+      '/secfieldDetails': (context) => const NewSecRepDetails(),
       '/firstReproduction': (context) => const FirstReproudctionArea(),
       '/secondReproduction': (context) => const SecondAcclimatizationPage(),
 

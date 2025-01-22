@@ -592,6 +592,73 @@ class ApiService {
     } 
 
   }
+  // code to add the Field Details to the first Reproducwtion Area
+  Future<bool> addSecondFieldDetails(Map<String, dynamic> secondfieldDetails) async {
+    String? firebaseToken = await authService.getIdToken();
+    if(firebaseToken == null){
+      print("Failed to retrieve Firebase Token");
+    }
 
+    final url = Uri.parse('$baseUrl/second_rep/add_sec_rep_details');
+
+    try{
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type' : 'application/json',
+          'Authorizatioin' : 'Beareer $firebaseToken',
+        },
+        body:  jsonEncode(secondfieldDetails)
+      );
+      if (response.statusCode == 200 || response.statusCode == 201){
+        print("Field detials added successfully.");
+        return true;
+      }else{
+        print("Failed to add field details. Status code: ${response.statusCode}");
+        print("Response body : ${response.body}");
+        return false;
+
+      }
+    }catch(e){
+      print('Error adding field details: $e');
+      return false;
+    } 
+
+  }
+
+
+  // Method to add a new cut record
+  Future<bool> addSecondCutRecord(Map<String, dynamic> cutData) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/second_cut/add_second_cut');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(cutData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Cut record added successfully.');
+        return true;
+      } else {
+        print('Failed to add cut record. Status code: ${response.statusCode}');
+        print('Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error adding cut record: $e');
+      return false;
+    }
+  }
   
 }
