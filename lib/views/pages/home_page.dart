@@ -436,7 +436,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ListTile(
             leading: const Icon(Icons.grass_outlined, color: Colors.white),
             title: const Text(
-              "1st Field Detials",
+              "1st Field Details",
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: "Product Sans Regular",
@@ -448,7 +448,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ListTile(
             leading: const Icon(Icons.grass_outlined, color: Colors.white),
             title: const Text(
-              "2nd Field Detials",
+              "2nd Field Details",
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: "Product Sans Regular",

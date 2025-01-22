@@ -207,7 +207,7 @@ FadeInUp(
   child: SizedBox(
     width: double.infinity,
     child: ElevatedButton(
-      onPressed: _isLoading ? null : _handleFieldDetailsSubmission,
+      onPressed: _isLoading ? null : _handleSecondCutSubmission,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green,
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -295,7 +295,7 @@ FadeInUp(
           );
   }
 
- Future<void> _handleFieldDetailsSubmission() async {
+Future<void> _handleSecondCutSubmission() async {
   if (_selectedVariety == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -311,21 +311,22 @@ FadeInUp(
   });
 
   final apiService = ref.read(apiServiceProvider);
-  final quantity = int.tryParse(_quantityController.text) ?? 0;
+  final quantityCut = int.tryParse(_quantityController.text) ?? 0;
   final mortality = int.tryParse(_mortalityController.text) ?? 0;
   final date = _dateController.text;
+  final totalLeft = quantityCut - mortality;
   const createdBy = 'user_name'; // Replace with actual user name if needed
 
-  final fieldDetails = {
-    'variety_id': _selectedVariety!['id'],
-    'plot_number': _plotNumber.text,
-    'field_name': _fieldName.text,
-    'date_of_transplanting': date,
-    'quantity_left_after_first_cut': quantity,
-    'mortality': mortality,
-  };
-
   try {
+    final fieldDetails = {
+      'variety_id': _selectedVariety!['id'],
+      'quantity_left_after_second_cut': totalLeft,
+      'plot_number': _plotNumber.text,
+      'field_name': _fieldName.text,
+      'date_of_transplanting': date,
+      'mortality': mortality,
+    };
+
     final success = await apiService.addSecondFieldDetails(fieldDetails);
 
     setState(() {
@@ -362,6 +363,8 @@ FadeInUp(
     );
   }
 }
+  
+  
   void _showNextStepDialog() {
     showDialog(
       context: context,

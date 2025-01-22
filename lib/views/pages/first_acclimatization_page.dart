@@ -188,7 +188,7 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white,),
         ),
       ),
       body: SafeArea(

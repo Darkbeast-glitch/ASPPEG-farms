@@ -78,12 +78,12 @@ class _SecondCutPageState extends ConsumerState<SecondCutPage> {
   }
 
   void _onVarietySelected(Map<String, dynamic> variety) {
-    setState(() {
-      _selectedVariety = variety;
-      _quantityController.text =
-          variety['quantity']?.toString() ?? '0'; // Safely handle null values
-    });
-  }
+  setState(() {
+    _selectedVariety = variety;
+    _quantityController.text =
+        variety['quantity']?.toString() ?? '0'; // Safely handle null values
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +231,7 @@ FadeInUp(
   child: SizedBox(
     width: double.infinity,
     child: ElevatedButton(
-      onPressed: _isLoading ? null : _handleCutSubmission,
+      onPressed: _isLoading ? null : _handleSecondCutSubmission,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green,
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -277,50 +277,52 @@ FadeInUp(
   }
 
   Widget _buildVarietyDropdown() {
-    return _isLoadingVarieties
-        ? const Center(child: CircularProgressIndicator())
-        : DropdownButtonFormField<Map<String, dynamic>>(
-            value: _selectedVariety,
-            items: _availableVarieties.map((variety) {
-              return DropdownMenuItem<Map<String, dynamic>>(
-                value: variety,
-                child: Text(
-                  variety['name'],
-                  style: const TextStyle(color: Colors.white),
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                _onVarietySelected(value);
-              }
-            },
-            dropdownColor: Colors.grey[850],
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              labelText: "Select Variety",
-              labelStyle: const TextStyle(color: Colors.white60),
-              prefixIcon:
-                  const Icon(Icons.local_florist, color: Colors.white60),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+  return _isLoadingVarieties
+      ? const Center(child: CircularProgressIndicator())
+      : DropdownButtonFormField<Map<String, dynamic>>(
+          value: _selectedVariety,
+          items: _availableVarieties.map((variety) {
+            return DropdownMenuItem<Map<String, dynamic>>(
+              value: variety,
+              child: Text(
+                variety['name'],
+                style: const TextStyle(color: Colors.white),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[700]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.green),
-              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              _onVarietySelected(value);
+            }
+          },
+          dropdownColor: Colors.grey[850],
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[800],
+            labelText: "Select Variety",
+            labelStyle: const TextStyle(color: Colors.white60),
+            prefixIcon: const Icon(Icons.local_florist, color: Colors.white60),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
-            style: const TextStyle(color: Colors.white),
-          );
-  }
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[700]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.green),
+            ),
+          ),
+          style: const TextStyle(color: Colors.white),
+        );
+}
 
-  Future<void> _handleCutSubmission() async {
+
+
+
+ Future<void> _handleSecondCutSubmission() async {
   if (_selectedVariety == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -348,20 +350,22 @@ FadeInUp(
   const createdBy = 'user_name'; // Replace with actual user name if needed
 
   try {
-    // Fetch the second_acclimatization_id from the API or relevant data source
-    final secondAcclimatizationData = await apiService.getSecondAcclimatizationData();
-    final secondAcclimatizationId = secondAcclimatizationData.firstWhere(
+    // Fetch the first_rep_details_id from the API or relevant data source
+    final firstDetailsData = await apiService.firstDetailPageData();
+    print('First Details Data: $firstDetailsData'); // Log the fetched data
+    print('Selected Variety ID: ${_selectedVariety!['id']}'); // Log the selected variety ID
+
+    final firstDetailsRecord = firstDetailsData.firstWhere(
       (data) => data['variety_id'] == _selectedVariety!['id'],
       orElse: () => <String, dynamic>{},
-    )['id'];
+    );
 
-    if (secondAcclimatizationId == null) {
-      throw Exception('Second Acclimatization ID not found for variety ID: ${_selectedVariety!['id']}');
-    }
+    final firstDetailsDataId = firstDetailsRecord['id'];
+    print('First Details Data ID: $firstDetailsDataId'); // Log the first details data ID
 
     final cutData = {
       'variety_id': _selectedVariety!['id'],
-      'second_acclimatization_id': secondAcclimatizationId,
+      'first_rep_details_id': firstDetailsDataId,
       'quantity_cut': quantityCut,
       'date': date,
       'week': week,
@@ -381,7 +385,7 @@ FadeInUp(
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cut record saved successfully!'),
+          content: Text('Second cut record saved successfully!'),
           backgroundColor: Colors.green,
         ),
       );
@@ -390,7 +394,7 @@ FadeInUp(
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to save cut record.'),
+          content: Text('Failed to save second cut record.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -408,6 +412,8 @@ FadeInUp(
     );
   }
 }
+  
+  
   void _showNextStepDialog() {
     showDialog(
       context: context,
@@ -420,7 +426,7 @@ FadeInUp(
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.pushNamed(context, '/fieldDetails');
+                Navigator.pushNamed(context, '/secfieldDetails');
               },
               child: const Text("Go to Field Details 2"),
             ),
@@ -429,7 +435,7 @@ FadeInUp(
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/secondReproduction');
               },
-              child: const Text("2ND Reproduction Area"),
+              child: const Text("Send to Production"),
             ),
           ],
         );

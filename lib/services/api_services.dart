@@ -592,39 +592,72 @@ class ApiService {
     } 
 
   }
-  // code to add the Field Details to the first Reproducwtion Area
-  Future<bool> addSecondFieldDetails(Map<String, dynamic> secondfieldDetails) async {
+
+//Method to get the First Detail Page Data
+   Future<List<Map<String, dynamic>>> firstDetailPageData() async {
     String? firebaseToken = await authService.getIdToken();
-    if(firebaseToken == null){
-      print("Failed to retrieve Firebase Token");
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return [];
     }
 
-    final url = Uri.parse('$baseUrl/second_rep/add_sec_rep_details');
-
-    try{
-      final response = await http.post(
+    final url = Uri.parse('$baseUrl/first_rep/get_first_rep_details');
+    try {
+      final response = await http.get(
         url,
         headers: {
-          'Content-Type' : 'application/json',
-          'Authorizatioin' : 'Beareer $firebaseToken',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
         },
-        body:  jsonEncode(secondfieldDetails)
       );
-      if (response.statusCode == 200 || response.statusCode == 201){
-        print("Field detials added successfully.");
-        return true;
-      }else{
-        print("Failed to add field details. Status code: ${response.statusCode}");
-        print("Response body : ${response.body}");
-        return false;
 
-      }
-    }catch(e){
-      print('Error adding field details: $e');
-      return false;
-    } 
-
+     if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      print('API Response: $data'); // Log the API response
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to load first details data');
+    }
+    } catch (e) {
+      print('Error fetching first details data: $e');
+      return [];
+    }
   }
+
+  // code to add the Field Details to the first Reproducwtion Area
+  Future<bool> addSecondFieldDetails(Map<String, dynamic> secondfieldDetails) async {
+  String? firebaseToken = await authService.getIdToken();
+  if (firebaseToken == null) {
+    print("Failed to retrieve Firebase Token");
+    return false;
+  }
+
+  final url = Uri.parse('$baseUrl/second_rep/add_second_rep_details');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $firebaseToken', // Correct the typo here
+      },
+      body: jsonEncode(secondfieldDetails),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Field details added successfully.");
+      return true;
+    } else {
+      print("Failed to add field details. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      return false;
+    }
+  } catch (e) {
+    print('Error adding field details: $e');
+    return false;
+  }
+}
+  
 
 
   // Method to add a new cut record
