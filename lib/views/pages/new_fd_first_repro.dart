@@ -309,7 +309,7 @@ FadeInUp(
   setState(() {
     _isLoading = true;
   });
-
+ 
   final apiService = ref.read(apiServiceProvider);
   final quantity = int.tryParse(_quantityController.text) ?? 0;
   final mortality = int.tryParse(_mortalityController.text) ?? 0;

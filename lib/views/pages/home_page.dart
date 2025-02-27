@@ -1,9 +1,11 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:myapp/providers/medium_buttons.dart';
 import 'package:myapp/providers/select_batch_prvoider.dart';
 import 'package:myapp/services/api_services.dart';
+import 'package:myapp/services/auth_services.dart';
 import 'package:myapp/utils/batch_button.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/overview_card.dart';
@@ -63,12 +65,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     // Watch the selected batch from the global provider
     final selectedBatch = ref.watch(selectedBatchProvider);
+    final userAuthProvider = ref.read(authServiceProvider);
 
     // Temporary hardcoded values
-    const userName = 'Julius';
+    // const userName = 'Julius';
     const userEmail = 'bbjulius900@gmail.com';
-    const plantsInGreenhouse = 0;
-    const cutsDue = 0;
+    const plantsInGreenhouse = 2000;
+    const cutsDue = 10000;
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 33, 29, 29),
@@ -81,20 +84,31 @@ class _HomePageState extends ConsumerState<HomePage> {
               color: Colors.white),
         ),
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, "/profile");
-              },
-              child: const Icon(
-                Icons.person,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
+         actions: [
+           Padding(
+             padding: const EdgeInsets.only(right: 16),
+             child: GestureDetector(
+               onTap: () async {
+              try {
+                await userAuthProvider.signOut();
+                Navigator.of(context).pushReplacementNamed('/login');
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Signed out successfully')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error signing out: $e')),
+                );
+              }
+               },
+                 
+               child: const Icon(
+                 Icons.logout,
+                 color: Colors.white,
+               ),
+             ),
+           ),
+         ],
         elevation: 0,
         backgroundColor: const Color.fromARGB(255, 33, 29, 29),
         leading: Builder(
@@ -138,23 +152,27 @@ class _HomePageState extends ConsumerState<HomePage> {
                         fit: BoxFit.fitWidth,
                       ),
                     ),
-                    const Positioned(
-                      top: 20,
-                      left: 60,
-                      child: Text(
-                        'Welcome, $userName!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Product Sans Bold",
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Welcome',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Product Sans Bold",
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
                     ),
                     // Display the currently selected batch
                     Positioned(
                       top: 50,
-                      left: 60,
+                      left: 120,
                       child: Text(
                           selectedBatch != null
                               ? 'Current Batch: $selectedBatch'
@@ -162,7 +180,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           style: AppConstants.subtitleTextStyle.copyWith(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                           )),
                     ),
                   ],
@@ -243,7 +261,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 MediumButtons(
                   onTap: () {
-                    Navigator.pushNamed(context, "/varietyData");
+                    Navigator.pushNamed(context, "/reportPage");
                   },
                   text: "Report",
                   icon: const Icon(
@@ -255,7 +273,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const Gap(10),
                 MediumButtons(
                     onTap: () {
-                      Navigator.pushNamed(context, "/secondAcclimatization");
+                      Navigator.pushNamed(context, "/reportPage");
                     },
                     text: "Issue",
                     icon: const Icon(
@@ -265,14 +283,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                     color: Colors.red),
               ],
             ),
-            const SizedBox(height: 16),
+
+            const Gap(20),
             const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   'Upcoming Actions',
                   style: TextStyle(
-                    color: Colors.green,
+                    color: Colors.white,
                     fontFamily: "Product Sans Bold",
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -281,10 +300,49 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
             ),
             const SizedBox(height: 8),
-            const UpcomingActionCard(
-              actionTitle: '1st Cut - Bellevue',
-              dueDate: '30th September',
-              daysLeft: 3,
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 100.0,
+                autoPlay: true,
+                enlargeCenterPage: true,
+                aspectRatio: 16 / 9,
+                autoPlayCurve: Curves.fastOutSlowIn,
+                enableInfiniteScroll: true,
+                autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                viewportFraction: 0.8,
+                
+              ),
+              items: [
+                const UpcomingActionCard(
+                  actionTitle: '1st Cut - Bellevue',
+                  dueDate: '30th September',
+                  daysLeft: 3,
+                ),
+                const UpcomingActionCard(
+                  actionTitle: '2nd Cut - Murasaki',
+                  dueDate: '5th October',
+                  daysLeft: 8,
+                ),
+                const UpcomingActionCard(
+                  actionTitle: '3rd Cut - Bellevue',
+                  dueDate: '10th October',
+                  daysLeft: 13,
+                ),
+              ].map((card) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.green, width: 1.0),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: card,
+                    );
+                  },
+                );
+              }).toList(),
             ),
           ],
         ),
@@ -306,11 +364,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         BottomNavigationBarItem(
           icon: Icon(size: 14, Icons.batch_prediction),
-          label: 'All Varieties',
+          label: 'GreenHouse',
         ),
         BottomNavigationBarItem(
           icon: Icon(size: 14, Icons.data_exploration),
-          label: 'Forecast',
+          label: 'Production',
         ),
         BottomNavigationBarItem(
           icon: Icon(
@@ -319,6 +377,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           label: 'Report',
         ),
+        
       ],
       currentIndex: _selectedIndex,
       selectedItemColor: Colors.green,
@@ -337,9 +396,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           UserAccountsDrawerHeader(
             accountEmail: Text(userEmail),
             currentAccountPicture: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/fly.jpg'),
+              backgroundImage: AssetImage('assets/images/user_avatar.jpg'),
             ),
-            accountName: const Text("Julius Boakye"),
+            accountName: const Text("Hi Asppeg"),
             decoration: const BoxDecoration(
               color: Colors.black87,
             ),

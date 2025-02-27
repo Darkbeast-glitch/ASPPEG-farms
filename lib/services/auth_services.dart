@@ -5,7 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/views/auths/login_page.dart';
 
-final authSerivceProvider = Provider<AuthService>((ref) {
+final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService(
       auth: FirebaseAuth.instance, googleSignIn: GoogleSignIn(), ref: ref);
 });
@@ -49,6 +49,9 @@ class AuthService {
 
       // Print the Firebase ID token to the console
       await printFirebaseToken();
+
+      // Navigate to the home page
+      Navigator.of(context).pushReplacementNamed('/home');
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       // Handle errors
@@ -86,7 +89,8 @@ class AuthService {
     await auth.signOut();
     await googleSignIn.signOut(); // Also sign out from Google if logged in with Google
 
-    
+    // Navigate to the login page
+    navigatorKey.currentState?.pushReplacementNamed('/login');
   }
 
   Future<void> signUpWithEmailAndPassword(

@@ -6,13 +6,14 @@ import 'package:myapp/models/batch_models.dart';
 import 'package:myapp/services/auth_services.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
-  final authService = ref.read(authSerivceProvider); // Ensure correct spelling
+  final authService = ref.read(authServiceProvider); // Ensure correct spelling
   return ApiService(authService);
 });
 
 class ApiService {
   final AuthService authService;
-  static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
+  // static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
+  static const String baseUrl = 'https://ab64-102-211-52-241.ngrok-free.app';
 
   ApiService(this.authService);
 
@@ -693,5 +694,48 @@ class ApiService {
       return false;
     }
   }
+
+
+  
+
+Future<bool> analyzeImage(Map<String, dynamic> image) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/image)analysis/analyze-plant-image');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(image),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Cut record added successfully.');
+        return true;
+      } else {
+        print('Failed to add cut record. Status code: ${response.statusCode}');
+        print('Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error adding cut record: $e');
+      return false;
+    }
+  }
+
+
+
+  
+
+
+  
   
 }

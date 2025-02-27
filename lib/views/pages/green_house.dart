@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/utils/constants.dart';
+import 'package:myapp/utils/my_buttons.dart';
 
 class GreenhousePage extends ConsumerStatefulWidget {
   const GreenhousePage({super.key});
@@ -214,6 +215,7 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
                                         fontSize: 13,
                                         fontFamily: "Product Sans Regular"),
                                   ),
+// put the button here to  make a cut here 
                                 ],
                               ),
                             ),
@@ -341,11 +343,11 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
         ),
         BottomNavigationBarItem(
           icon: Icon(size: 14, Icons.batch_prediction),
-          label: 'All Varieties',
+          label: 'GreenHouse',
         ),
         BottomNavigationBarItem(
           icon: Icon(size: 14, Icons.data_exploration),
-          label: 'Forecast',
+          label: 'Prduction',
         ),
         BottomNavigationBarItem(
           icon: Icon(

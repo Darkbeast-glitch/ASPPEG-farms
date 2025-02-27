@@ -3,7 +3,6 @@ import 'package:myapp/views/auths/auth_gate.dart';
 import 'package:myapp/views/auths/login_page.dart';
 import 'package:myapp/views/auths/register_page.dart';
 import 'package:myapp/views/pages/batch_select.dart';
-import 'package:myapp/views/pages/field_details_first_repro.dart';
 import 'package:myapp/views/pages/first_acclimatization_page.dart';
 import 'package:myapp/views/pages/arrival_data.dart';
 import 'package:myapp/views/pages/existing_batch_page.dart';
@@ -15,7 +14,9 @@ import 'package:myapp/views/pages/home_page.dart';
 import 'package:myapp/views/pages/new_batch.dart';
 import 'package:myapp/views/pages/new_sec_rep_details.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';
+import 'package:myapp/views/pages/production_page.dart';
 import 'package:myapp/views/pages/profile_page.dart';
+import 'package:myapp/views/pages/report_page.dart';
 import 'package:myapp/views/pages/second_acclimatizaton_page.dart';
 import 'package:myapp/views/pages/second_cut_page.dart';
 import 'package:myapp/views/pages/variety_data.dart';
@@ -47,6 +48,8 @@ class Routes {
       '/secfieldDetails': (context) => const NewSecRepDetails(),
       '/firstReproduction': (context) => const FirstReproudctionArea(),
       '/secondReproduction': (context) => const SecondAcclimatizationPage(),
+      '/prodPage': (context) => const ProductionPage(),
+      '/reportPage': (context) => const ReportPage(),
 
 
       // Add other routes here

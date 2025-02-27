@@ -122,7 +122,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
 
     try {
       final apiService = ref.read(apiServiceProvider);
-      final authService = ref.read(authSerivceProvider);
+      final authService = ref.read(authServiceProvider);
       final firebaseUID = await authService.getIdToken();
       final fullName = await apiService.fetchUserFullName(firebaseUID!);
 

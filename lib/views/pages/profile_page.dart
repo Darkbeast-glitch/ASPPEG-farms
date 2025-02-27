@@ -10,7 +10,7 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAuthProvider = ref.read(authSerivceProvider);
+    final userAuthProvider = ref.read(authServiceProvider);
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
