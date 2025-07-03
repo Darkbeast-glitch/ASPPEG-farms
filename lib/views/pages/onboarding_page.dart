@@ -45,6 +45,10 @@ class OnboardingPage extends ConsumerWidget {
                 fit: BoxFit.cover,
                 height: double.infinity,
                 width: double.infinity,
+                alignment: Alignment.topCenter,
+                // Fix upside down image by forcing no rotation
+                // and flipping if needed
+                // If still upside down, use Transform
               ),
             ),
 
@@ -113,10 +117,10 @@ class OnboardingPage extends ConsumerWidget {
                       ref.read(currentPageProvider.notifier).state = index;
                     },
                     children: const [
+                      // Fix upside down images by wrapping with Transform in OnboadingCards widget
                       OnboadingCards(
                         imagePath: "assets/images/smartphone.png",
-                        shortDescription:
-                            "Crop Disease \nDetection \nin Single Click",
+                        shortDescription: "Crop Disease \nDetection \nin Single Click",
                       ),
                       OnboadingCards(
                         imagePath: "assets/images/report.png",

@@ -43,6 +43,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               fit: BoxFit.cover,
               height: double.infinity,
               width: double.infinity,
+              alignment: Alignment.topCenter,
+              // If still upside down, wrap with Transform
             ),
           ),
           // Blur effect

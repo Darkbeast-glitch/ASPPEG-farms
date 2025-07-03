@@ -181,4 +181,9 @@ class AuthService {
       return null;
     }
   }
+
+  // Method to get the current logged in user
+  User? getCurrentUser() {
+    return auth.currentUser;
+  }
 }

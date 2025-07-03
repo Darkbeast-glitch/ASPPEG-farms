@@ -13,7 +13,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   final AuthService authService;
   // static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
-  static const String baseUrl = 'https://ab64-102-211-52-241.ngrok-free.app';
+  static const String baseUrl = 'https://ddb1-102-211-52-228.ngrok-free.app';
 
   ApiService(this.authService);
 
@@ -528,38 +528,43 @@ class ApiService {
     }
   }
 
-
-// Fetch second acclimatization data
-  Future<List<Map<String, dynamic>>> getSecondAcclimatizationData() async {
-    String? firebaseToken = await authService.getIdToken();
-    if (firebaseToken == null) {
-      print('Failed to retrieve Firebase token.');
-      return [];
-    }
-
-    final url = Uri.parse('$baseUrl/secondAccl/all_second_accl');
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $firebaseToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        return data.cast<Map<String, dynamic>>();
-      } else {
-        print('Failed to fetch second acclimatization data. Status code: ${response.statusCode}');
-        return [];
-      }
-    } catch (e) {
-      print('Error fetching second acclimatization data: $e');
-      return [];
-    }
+// Add this method to your ApiService class
+Future<List<Map<String, dynamic>>> getSecondAcclimatizationData() async {
+  String? firebaseToken = await authService.getIdToken();
+  if (firebaseToken == null) {
+    print('Failed to retrieve Firebase token.');
+    return [];
   }
 
+  try {
+    Uri url = Uri.parse('$baseUrl/secondAccl/all_second_accl');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $firebaseToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((item) => {
+        'id': item['id'],
+        'variety_id': item['variety_id'],
+        'variety_name': item['variety']['variety_name'],
+        'ac_total_left': item['ac_total_left'],
+        'quantity': item['quantity'],
+      }).toList();
+    } else {
+      print('Failed to fetch second acclimatization data. Status code: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching second acclimatization data: $e');
+    return [];
+  }
+}
   // code to add the Field Details to the first Reproducwtion Area
   Future<bool> addFieldDetails(Map<String, dynamic> fieldDetails) async {
     String? firebaseToken = await authService.getIdToken();

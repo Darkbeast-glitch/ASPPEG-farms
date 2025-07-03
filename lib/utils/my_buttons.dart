@@ -23,7 +23,7 @@ class MyButton extends StatelessWidget {
           color: const Color.fromARGB(255, 79, 163, 39),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withAlpha((0.3 * 255).toInt()),
               spreadRadius: 3,
               blurRadius: 7,
               offset: const Offset(0, 3), // changes position of shadow

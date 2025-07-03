@@ -226,8 +226,8 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
 
                 // Mortality (Optional)
                 ArrivalTextForm(
-                    labelText: "Mortality (Optional)",
-                    hintText: "This is optional",
+                    labelText: "Mortality",
+                    hintText: "Enter Mortality",
                     controller: mortalityController,
                     suffixicon: const Icon(Icons.info_outline_rounded),
                     type: const TextInputType.numberWithOptions()),
@@ -287,16 +287,31 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
                 const Gap(20),
 
                 // Save Button
-                Center(
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : MediumButtons(
-                          text: "Save",
-                          icon: const Icon(Icons.save,
-                              color: Colors.white, size: 25),
-                          color: Colors.green,
-                          onTap: _submitArrivalData,
-                        ),
+                Row(
+                  children: [
+                    Center(
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : MediumButtons(
+                              text: "Save",
+                              icon: const Icon(Icons.save,
+                                  color: Colors.white, size: 25),
+                              color: Colors.green,
+                              onTap: _submitArrivalData,
+                            ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: MediumButtons(
+                                text: "Get Report",
+                                icon: const Icon(Icons.download,
+                                    color: Colors.white, size: 25),
+                                color: Colors.red,
+                                onTap: (){},
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
                 const Gap(20),
               ],

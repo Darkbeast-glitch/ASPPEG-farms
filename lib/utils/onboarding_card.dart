@@ -27,6 +27,7 @@ class OnboadingCards extends StatelessWidget {
           child: Column(
             children: [
               // The image of the card
+              // Show the image as-is (no transform)
               Image.asset(imagePath),
               const Gap(20),
 

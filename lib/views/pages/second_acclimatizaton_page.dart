@@ -27,39 +27,46 @@ class _SecondAcclimatizationPageState
     _addAcclimatizationForm();
   }
 
+    // In the _fetchAvailableVarieties method, replace the existing implementation with:
   Future<void> _fetchAvailableVarieties() async {
     final apiService = ref.read(apiServiceProvider);
-
+  
     setState(() {
       _isLoadingVarietyData = true;
     });
-
+  
     try {
-      final varieties = await apiService.getVarietyData();
-
+      final varieties = await apiService.getFirstAcclimatizationData();
+  
       setState(() {
         _availableVarieties = varieties
+            .where((variety) => (variety['ac_total_left'] ?? 0) > 0) // Check ac_total_left instead
             .map((variety) => {
-                  'name': variety['variety_name'],
-                  'total_left': variety['total_left'],
-                  'id': variety['id']
+                  'name': variety['variety']['variety_name'], // Nested variety name
+                  'total_left': variety['ac_total_left'], // Use ac_total_left from root
+                  'id': variety['variety_id']
                 })
             .toList();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching varieties: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching varieties: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoadingVarietyData = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingVarietyData = false;
+        });
+      }
     }
   }
-
+  
+  
   void _addAcclimatizationForm() {
     setState(() {
       _acclimatizationForms.add({
@@ -135,7 +142,7 @@ class _SecondAcclimatizationPageState
     _showNextStepDialog();
   }
 
-  void _showNextStepDialog() { 
+  void _showNextStepDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -164,6 +171,22 @@ class _SecondAcclimatizationPageState
     );
   }
 
+  List<Map<String, dynamic>> _getAvailableVarietiesForIndex(int index) {
+    // Get all currently selected varieties except for the current form
+    final selectedVarieties = _acclimatizationForms
+        .asMap()
+        .entries
+        .where((entry) =>
+            entry.key != index && entry.value['variety']!.text.isNotEmpty)
+        .map((entry) => entry.value['variety']!.text)
+        .toList();
+
+    // Return only varieties that haven't been selected
+    return _availableVarieties
+        .where((variety) => !selectedVarieties.contains(variety['name']))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,7 +205,10 @@ class _SecondAcclimatizationPageState
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white,),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+          ),
         ),
       ),
       body: SafeArea(
@@ -289,8 +315,6 @@ class _SecondAcclimatizationPageState
           ),
         ),
       ),
-      
-      
     );
   }
 
@@ -358,7 +382,8 @@ class _SecondAcclimatizationPageState
                       _acclimatizationForms[index]['variety']!.text.isNotEmpty
                           ? _acclimatizationForms[index]['variety']!.text
                           : null,
-                  items: _availableVarieties,
+                  items: _getAvailableVarietiesForIndex(
+                      index), // Changed this line to use the filtering method
                   onChanged: (value) {
                     setState(() {
                       _acclimatizationForms[index]['variety']!.text =

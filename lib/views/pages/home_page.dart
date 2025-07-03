@@ -239,17 +239,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                     value: '$_activeBatches',
                   ),
                   const Gap(5),
-                  const OverviewCard(
-                    icon: Icons.grass,
-                    label: 'Plants in Greenhouse',
-                    value: '$plantsInGreenhouse',
+                   OverviewCard(
+                    icon: Icons.add_circle_rounded,
+                    label: 'Add Custom Reproduction Area',
+                    onTap: (){
+                      Navigator.pushNamed(context, "/fieldDetails");
+                    },
                   ),
                   const Gap(5),
-                  const OverviewCard(
-                    icon: Icons.warning,
-                    label: 'Total Reproduction',
-                    value: '$cutsDue',
-                    iconColor: Colors.yellow,
+                   OverviewCard(
+                    onTap: (){
+                      Navigator.pushNamed(context, "/greenHouse");
+                    },
+                    icon: Icons.house,
+                    label: 'Go to GreenHouse',
+                    iconColor: Colors.green,
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -456,18 +460,18 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             onTap: () => Navigator.pushNamed(context, "/secondCut"),
           ),
-          ListTile(
-            leading: const Icon(Icons.eco, color: Colors.white),
-            title: const Text(
-              "Greenhouse",
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Product Sans Regular",
-                fontSize: 13,
-              ),
-            ),
-            onTap: () => Navigator.pushNamed(context, "/greenHouse"),
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.eco, color: Colors.white),
+          //   title: const Text(
+          //     "Greenhouse",
+          //     style: TextStyle(
+          //       color: Colors.white,
+          //       fontFamily: "Product Sans Regular",
+          //       fontSize: 13,
+          //     ),
+          //   ),
+          //   onTap: () => Navigator.pushNamed(context, "/greenHouse"),
+          // ),
           ListTile(
             leading: const Icon(Icons.grass, color: Colors.white),
             title: const Text(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/api_services.dart';
+import 'package:myapp/services/auth_services.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:gap/gap.dart';
 import 'package:animate_do/animate_do.dart';
@@ -50,32 +51,34 @@ class _FirstCutPageState extends ConsumerState<FirstCutPage> {
 
   // Fetch varieties from the API
   Future<void> _fetchAvailableVarieties() async {
-    final apiService = ref.read(apiServiceProvider);
+  final apiService = ref.read(apiServiceProvider);
 
-    try {
-      final varieties = await apiService.getVarietyData();
-      setState(() {
-        _availableVarieties = varieties
-            .map((variety) => {
-                  'id': variety['id'],
-                  'name': variety['variety_name'],
-                  'quantity': variety['quantity'] ??
-                      0, // Ensure quantity has a default value if null
-                })
-            .toList();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Error fetching varieties: $e'),
-            backgroundColor: Colors.red),
-      );
-    } finally {
-      setState(() {
-        _isLoadingVarieties = false;
-      });
-    }
+  try {
+    final varieties = await apiService.getSecondAcclimatizationData();
+    setState(() {
+      _availableVarieties = varieties
+          .where((variety) => (variety['ac_total_left'] ?? 0) > 0)
+          .map((variety) => {
+                'id': variety['variety_id'],
+                'name': variety['variety_name'],
+                'quantity': variety['ac_total_left'], // Use ac_total_left instead of initial quantity
+                'second_acclimatization_id': variety['id'], // Store this for later use
+              })
+          .toList();
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text('Error fetching varieties: $e'),
+          backgroundColor: Colors.red),
+    );
+  } finally {
+    setState(() {
+      _isLoadingVarieties = false;
+    });
   }
+}
+
 
   void _onVarietySelected(Map<String, dynamic> variety) {
     setState(() {
@@ -319,8 +322,9 @@ FadeInUp(
             style: const TextStyle(color: Colors.white),
           );
   }
-
-  Future<void> _handleCutSubmission() async {
+// / Modify _handleCutSubmission to use the stored second_acclimatization_id
+// Modify _handleCutSubmission method:
+Future<void> _handleCutSubmission() async {
   if (_selectedVariety == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -336,6 +340,24 @@ FadeInUp(
   });
 
   final apiService = ref.read(apiServiceProvider);
+  final authService = ref.read(authServiceProvider);
+  
+  // Get current user
+  final currentUser = authService.getCurrentUser();
+  
+  if (currentUser == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('User not authenticated'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    return;
+  }
+
   final quantityCut = int.tryParse(_quantityCutController.text) ?? 0;
   final mortality = int.tryParse(_mortalityController.text) ?? 0;
   final date = _dateController.text;
@@ -345,29 +367,17 @@ FadeInUp(
       ? (totalLeft / (int.tryParse(_quantityController.text) ?? 1))
           .toStringAsFixed(2)
       : '0.00';
-  const createdBy = 'user_name'; // Replace with actual user name if needed
 
   try {
-    // Fetch the second_acclimatization_id from the API or relevant data source
-    final secondAcclimatizationData = await apiService.getSecondAcclimatizationData();
-    final secondAcclimatizationId = secondAcclimatizationData.firstWhere(
-      (data) => data['variety_id'] == _selectedVariety!['id'],
-      orElse: () => <String, dynamic>{},
-    )['id'];
-
-    if (secondAcclimatizationId == null) {
-      throw Exception('Second Acclimatization ID not found for variety ID: ${_selectedVariety!['id']}');
-    }
-
     final cutData = {
       'variety_id': _selectedVariety!['id'],
-      'second_acclimatization_id': secondAcclimatizationId,
+      'second_acclimatization_id': _selectedVariety!['second_acclimatization_id'],
       'quantity_cut': quantityCut,
       'date': date,
       'week': week,
       'reproduction_rate': double.tryParse(reproductionRate) ?? 0.0,
       'mortality': mortality,
-      'created_by': createdBy,
+      'created_by': currentUser.displayName ?? currentUser.email ?? 'Unknown user',
       'quantity': int.tryParse(_quantityController.text) ?? 0,
       'total_left': totalLeft,
     };
@@ -379,33 +389,37 @@ FadeInUp(
     });
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cut record saved successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      _showNextStepDialog();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cut record saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        _showNextStepDialog();
+      }
     } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to save cut record.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  } catch (e) {
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to save cut record.'),
+        SnackBar(
+          content: Text('Error: $e'),
           backgroundColor: Colors.red,
         ),
       );
     }
-  } catch (e) {
-    setState(() {
-      _isLoading = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Error: $e'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
 }
   void _showNextStepDialog() {

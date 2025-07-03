@@ -66,14 +66,14 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
               Navigator.pop(context);
             },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {
-                // Implement menu action
-              },
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.menu, color: Colors.white),
+          //     onPressed: () {
+          //       // Implement menu action
+          //     },
+          //   ),
+          // ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -215,7 +215,17 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
                                         fontSize: 13,
                                         fontFamily: "Product Sans Regular"),
                                   ),
-// put the button here to  make a cut here 
+                                  const SizedBox(height: 10),
+
+                                  MyButton(
+                                      onTap: () {
+                                        // Navigate to the First Cut Page with the variety data
+                                        Navigator.pushNamed(
+                                            context, '/firstCut',
+                                            );
+                                      },
+                                      text: "Make a cut")
+// put the button here to  make a cut here
                                 ],
                               ),
                             ),
