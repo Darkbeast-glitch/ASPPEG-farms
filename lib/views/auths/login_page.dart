@@ -6,14 +6,27 @@ import 'package:myapp/services/auth_services.dart';
 import 'package:myapp/utils/constants.dart';
 import 'package:myapp/utils/my_textfield.dart';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key, this.onTap});
   final Function()? onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -30,6 +43,8 @@ class LoginPage extends ConsumerWidget {
               fit: BoxFit.cover,
               height: double.infinity,
               width: double.infinity,
+              alignment: Alignment.topCenter,
+              // If still upside down, wrap with Transform
             ),
           ),
           // Blur effect
@@ -89,22 +104,21 @@ class LoginPage extends ConsumerWidget {
                         controller: passwordController,
                         obsecureText: true,
                       ),
-                      const Gap(10),
 
                       // Forgot password text
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              "Forgot Password?",
-                              style: AppConstants.subtitleTextStyle
-                                  .copyWith(color: Colors.blue, fontSize: 13),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(right: 10),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.end,
+                      //     children: [
+                      //       Text(
+                      //         "Forgot Password?",
+                      //         style: AppConstants.subtitleTextStyle
+                      //             .copyWith(color: Colors.blue, fontSize: 13),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                       const Gap(30),
 
                       // Login button
@@ -112,7 +126,7 @@ class LoginPage extends ConsumerWidget {
                         onTap: () async {
                           try {
                             await ref
-                                .read(authSerivceProvider)
+                                .read(authServiceProvider)
                                 .signInWithEmailAndPassword(
                                     emailController.text,
                                     passwordController.text,
@@ -153,29 +167,29 @@ class LoginPage extends ConsumerWidget {
                         ),
                       ),
 
-                      const Gap(20),
+                      const Gap(30),
 
                       // Don't have an account text
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Don't have an account?",
-                            style: AppConstants.subtitleTextStyle
-                                .copyWith(color: Colors.white, fontSize: 13),
-                          ),
-                          const Gap(5),
-                          GestureDetector(
-                            onTap: onTap,
-                            child: Text(
-                              "Create an account.",
-                              style: AppConstants.subtitleTextStyle
-                                  .copyWith(color: Colors.blue, fontSize: 13),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Gap(30),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [
+                      //     Text(
+                      //       "Don't have an account?",
+                      //       style: AppConstants.subtitleTextStyle
+                      //           .copyWith(color: Colors.white, fontSize: 13),
+                      //     ),
+                      //     const Gap(5),
+                      //     GestureDetector(
+                      //       onTap: widget.onTap,
+                      //       child: Text(
+                      //         "Create an account.",
+                      //         style: AppConstants.subtitleTextStyle
+                      //             .copyWith(color: Colors.blue, fontSize: 13),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // const Gap(30),
 
                       // Divider with "Or Sign In with"
                       Row(
@@ -190,9 +204,9 @@ class LoginPage extends ConsumerWidget {
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              "Or Sign In with",
+                              "Got a Problem",
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 13),
+                                  TextStyle(color: Colors.red, fontSize: 13),
                             ),
                           ),
                           Expanded(
@@ -203,19 +217,30 @@ class LoginPage extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const Gap(20),
 
-                      Image.asset("assets/images/goog.png"),
+                      // Text
                       const Gap(20),
 
                       const Text(
-                        "Terms of Services\nPrivacy of Policy",
-                        textAlign: TextAlign.center,
+                        "Incase you have a problem with your account, please contact us 0500159892",
+                        textAlign: TextAlign.justify,
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: "Product Sans Regular",
-                            fontSize: 10),
+                            fontSize: 13),
                       ),
+
+                      // Image.asset("assets/images/goog.png"),
+                      // const Gap(20),
+
+                      // const Text(
+                      //   "Terms of Services\nPrivacy of Policy",
+                      //   textAlign: TextAlign.center,
+                      //   style: TextStyle(
+                      //       color: Colors.white,
+                      //       fontFamily: "Product Sans Regular",
+                      //       fontSize: 10),
+                      // ),
                     ],
                   ),
                 ),

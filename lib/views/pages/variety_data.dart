@@ -47,6 +47,29 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
     });
   }
 
+  void _deleteVarietyForm(int index) {
+    setState(() {
+      _varietyForms.removeAt(index);
+    });
+  }
+
+  List<String> _getAvailableVarietiesForIndex(int index) {
+    // Get all currently selected varieties except for the current form
+    final selectedVarieties = _varietyForms
+        .asMap()
+        .entries
+        .where((entry) =>
+            entry.key != index &&
+            (entry.value['variety'] as TextEditingController).text.isNotEmpty)
+        .map((entry) => (entry.value['variety'] as TextEditingController).text)
+        .toList();
+
+    // Return available varieties excluding selected ones
+    return _availableVarieties
+        .where((variety) => !selectedVarieties.contains(variety))
+        .toList();
+  }
+
   Future<void> _pickImage(int index) async {
     try {
       final ImagePicker picker = ImagePicker();
@@ -122,7 +145,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
 
     try {
       final apiService = ref.read(apiServiceProvider);
-      final authService = ref.read(authSerivceProvider);
+      final authService = ref.read(authServiceProvider);
       final firebaseUID = await authService.getIdToken();
       final fullName = await apiService.fetchUserFullName(firebaseUID!);
 
@@ -150,7 +173,7 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
 
         final success = await apiService.addVarietyData(varietyData);
         if (!success) {
-          throw Exception('Variety Already exist');
+          throw Exception('Failed to save variety data. Variety might already exist.');
         }
       }
 
@@ -194,14 +217,14 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/addAcclimatization');
               },
-              child: const Text("Continue with Acclimatization"),
+              child: const Text("Continue with Acclimatization", style: TextStyle(color: Colors.white),),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/home');
               },
-              child: const Text("Do it Later"),
+              child: const Text("Do it Later", style: TextStyle(color: Colors.white),),
             ),
           ],
         );
@@ -225,7 +248,10 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
       ),
       body: Padding(
@@ -314,14 +340,26 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Variety Input ${index + 1}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Product Sans Bold",
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Variety Input ${index + 1}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Product Sans Bold",
+                  ),
+                ),
+                // Only show delete button if there's more than one form
+                if (_varietyForms.length > 1)
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _deleteVarietyForm(index),
+                    tooltip: 'Delete variety',
+                  ),
+              ],
             ),
             const Gap(15),
             GestureDetector(
@@ -404,7 +442,8 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
                   ? (_varietyForms[index]['variety'] as TextEditingController)
                       .text
                   : null,
-              items: _availableVarieties.map((String variety) {
+              items:
+                  _getAvailableVarietiesForIndex(index).map((String variety) {
                 return DropdownMenuItem<String>(
                   value: variety,
                   child: Text(
@@ -463,8 +502,8 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.grey[700],
-                hintText: 'Mortality (Optional)',
+                fillColor: Colors.grey[700], 
+                hintText: 'Mortality',
                 hintStyle: const TextStyle(
                   color: Colors.white60,
                   fontFamily: "Product Sans Regular",

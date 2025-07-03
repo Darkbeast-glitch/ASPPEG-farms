@@ -1,0 +1,2 @@
+C:/Users/FLEXLAB/Desktop/Devs/ASPPEG-farms/android/app/.cxx/Debug/3y3x1q4n/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/FLEXLAB/Desktop/Devs/ASPPEG-farms/android/app/.cxx/Debug/3y3x1q4n/x86_64/CMakeFiles/rebuild_cache.dir

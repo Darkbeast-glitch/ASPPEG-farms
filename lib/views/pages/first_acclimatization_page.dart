@@ -25,6 +25,7 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
     _addAcclimatizationForm();
   }
 
+
   // Fetch varieties from the existing endpoint
   Future<void> _fetchAvailableVarieties() async {
     final apiService = ref.read(apiServiceProvider);
@@ -74,6 +75,24 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
       });
     });
   }
+
+// Add this method after _getVarietyId
+List<Map<String, dynamic>> _getAvailableVarietiesForIndex(int index) {
+  // Get all currently selected varieties except for the current form
+  final selectedVarieties = _acclimatizationForms
+      .asMap()
+      .entries
+      .where((entry) => 
+          entry.key != index && 
+          entry.value['variety']!.text.isNotEmpty)
+      .map((entry) => entry.value['variety']!.text)
+      .toList();
+
+  // Return only varieties that haven't been selected
+  return _availableVarieties
+      .where((variety) => !selectedVarieties.contains(variety['name']))
+      .toList();
+}
 
   // Calculate the Total Left
   void _calculateTotalLeft(int index) {
@@ -188,7 +207,7 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white,),
         ),
       ),
       body: SafeArea(
@@ -201,7 +220,7 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withAlpha(25),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.green.withOpacity(0.3)),
                   ),
@@ -356,17 +375,17 @@ class _AcclimatizationPageState extends ConsumerState<AcclimatizationPage> {
                   icon: Icons.event,
                 ),
                 const Gap(16),
+                                // In the _buildAcclimatizationForm method, replace the existing _buildDropdown call with:
+                
                 _buildDropdown(
                   label: "Select Variety",
-                  value:
-                      _acclimatizationForms[index]['variety']!.text.isNotEmpty
-                          ? _acclimatizationForms[index]['variety']!.text
-                          : null,
-                  items: _availableVarieties,
+                  value: _acclimatizationForms[index]['variety']!.text.isNotEmpty
+                      ? _acclimatizationForms[index]['variety']!.text
+                      : null,
+                  items: _getAvailableVarietiesForIndex(index), // Changed this line to use the filtering method
                   onChanged: (value) {
                     setState(() {
-                      _acclimatizationForms[index]['variety']!.text =
-                          value ?? '';
+                      _acclimatizationForms[index]['variety']!.text = value ?? '';
                       final selectedVariety = _availableVarieties.firstWhere(
                         (variety) => variety['name'] == value,
                         orElse: () => {},

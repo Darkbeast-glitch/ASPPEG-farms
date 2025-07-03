@@ -61,31 +61,84 @@ class BatchSelectionPage extends ConsumerWidget {
                     return Opacity(
                       opacity: value,
                       child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - value)),
-                        child: Text(
-                          "What would you like to do?",
-                          style: AppConstants.titleTextStyle.copyWith(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Column(
+                            children: [
+                              Text(
+                                "What would you like to do?",
+                                style: AppConstants.titleTextStyle.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                "Take note, you won't be able to create batch until 1 year after the last batch creation.",
+                                style: AppConstants.titleTextStyle.copyWith(
+                                  color: Colors.red[300],
+                                  fontSize: 11,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w300,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          )),
                     );
                   },
                 ),
                 const SizedBox(height: 50),
 
-                // Create Batch Button
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: MediumButtons(
-                    text: "Create a Batch",
-                    color: Colors.green,
-                    onTap: () {
-                      Navigator.pushNamed(context, '/newBatch');
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final apiService = ref.watch(apiServiceProvider);
+                      return FutureBuilder<List<Batch>>(
+                        future: apiService.getBatches(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          final batches = snapshot.data ?? [];
+                          bool isButtonDisabled = false;
+
+                          if (batches.isNotEmpty) {
+                            // Sort batches by creation date to get the latest one
+                            batches.sort(
+                                (a, b) => b.createdAt.compareTo(a.createdAt));
+                            final latestBatch = batches.first;
+
+                            final currentDate = DateTime.now();
+                            final batchCreationDate = latestBatch.createdAt;
+                            final difference = currentDate
+                                .difference(batchCreationDate)
+                                .inDays;
+
+                            if (difference < 365) {
+                              isButtonDisabled = true;
+                            }
+                          }
+
+                          return MediumButtons(
+                            text: "Create a Batch",
+                            color:
+                                isButtonDisabled ? Colors.grey : Colors.green,
+                            onTap: isButtonDisabled
+                                ? null
+                                : () {
+                                    Navigator.pushNamed(context, '/newBatch');
+                                  },
+                          );
+                        },
+                      );
                     },
                   ),
                 ),

@@ -6,13 +6,14 @@ import 'package:myapp/models/batch_models.dart';
 import 'package:myapp/services/auth_services.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
-  final authService = ref.read(authSerivceProvider); // Ensure correct spelling
+  final authService = ref.read(authServiceProvider); // Ensure correct spelling
   return ApiService(authService);
 });
 
 class ApiService {
   final AuthService authService;
-  static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
+  // static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
+  static const String baseUrl = 'https://ddb1-102-211-52-228.ngrok-free.app';
 
   ApiService(this.authService);
 
@@ -526,4 +527,220 @@ class ApiService {
       return false;
     }
   }
+
+// Add this method to your ApiService class
+Future<List<Map<String, dynamic>>> getSecondAcclimatizationData() async {
+  String? firebaseToken = await authService.getIdToken();
+  if (firebaseToken == null) {
+    print('Failed to retrieve Firebase token.');
+    return [];
+  }
+
+  try {
+    Uri url = Uri.parse('$baseUrl/secondAccl/all_second_accl');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $firebaseToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((item) => {
+        'id': item['id'],
+        'variety_id': item['variety_id'],
+        'variety_name': item['variety']['variety_name'],
+        'ac_total_left': item['ac_total_left'],
+        'quantity': item['quantity'],
+      }).toList();
+    } else {
+      print('Failed to fetch second acclimatization data. Status code: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching second acclimatization data: $e');
+    return [];
+  }
+}
+  // code to add the Field Details to the first Reproducwtion Area
+  Future<bool> addFieldDetails(Map<String, dynamic> fieldDetails) async {
+    String? firebaseToken = await authService.getIdToken();
+    if(firebaseToken == null){
+      print("Failed to retrieve Firebase Token");
+    }
+
+    final url = Uri.parse('$baseUrl/first_rep/add_first_rep_details');
+
+    try{
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type' : 'application/json',
+          'Authorizatioin' : 'Beareer $firebaseToken',
+        },
+        body:  jsonEncode(fieldDetails)
+      );
+      if (response.statusCode == 200 || response.statusCode == 201){
+        print("Field detials added successfully.");
+        return true;
+      }else{
+        print("Failed to add field details. Status code: ${response.statusCode}");
+        print("Response body : ${response.body}");
+        return false;
+
+      }
+    }catch(e){
+      print('Error adding field details: $e');
+      return false;
+    } 
+
+  }
+
+//Method to get the First Detail Page Data
+   Future<List<Map<String, dynamic>>> firstDetailPageData() async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return [];
+    }
+
+    final url = Uri.parse('$baseUrl/first_rep/get_first_rep_details');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+      );
+
+     if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      print('API Response: $data'); // Log the API response
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to load first details data');
+    }
+    } catch (e) {
+      print('Error fetching first details data: $e');
+      return [];
+    }
+  }
+
+  // code to add the Field Details to the first Reproducwtion Area
+  Future<bool> addSecondFieldDetails(Map<String, dynamic> secondfieldDetails) async {
+  String? firebaseToken = await authService.getIdToken();
+  if (firebaseToken == null) {
+    print("Failed to retrieve Firebase Token");
+    return false;
+  }
+
+  final url = Uri.parse('$baseUrl/second_rep/add_second_rep_details');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $firebaseToken', // Correct the typo here
+      },
+      body: jsonEncode(secondfieldDetails),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Field details added successfully.");
+      return true;
+    } else {
+      print("Failed to add field details. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      return false;
+    }
+  } catch (e) {
+    print('Error adding field details: $e');
+    return false;
+  }
+}
+  
+
+
+  // Method to add a new cut record
+  Future<bool> addSecondCutRecord(Map<String, dynamic> cutData) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/second_cut/add_second_cut');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(cutData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Cut record added successfully.');
+        return true;
+      } else {
+        print('Failed to add cut record. Status code: ${response.statusCode}');
+        print('Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error adding cut record: $e');
+      return false;
+    }
+  }
+
+
+  
+
+Future<bool> analyzeImage(Map<String, dynamic> image) async {
+    String? firebaseToken = await authService.getIdToken();
+    if (firebaseToken == null) {
+      print('Failed to retrieve Firebase token.');
+      return false;
+    }
+
+    final url = Uri.parse('$baseUrl/image)analysis/analyze-plant-image');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $firebaseToken',
+        },
+        body: jsonEncode(image),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Cut record added successfully.');
+        return true;
+      } else {
+        print('Failed to add cut record. Status code: ${response.statusCode}');
+        print('Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error adding cut record: $e');
+      return false;
+    }
+  }
+
+
+
+  
+
+
+  
+  
 }

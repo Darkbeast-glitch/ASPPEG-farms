@@ -53,7 +53,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     try {
       // Access the auth service and attempt to register the user
-      final authService = ref.read(authSerivceProvider);
+      final authService = ref.read(authServiceProvider);
       await authService.signUpWithEmailAndPassword(
           name, email, password, context);
     } catch (e) {

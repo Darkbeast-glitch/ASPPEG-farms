@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/services/api_services.dart';
 import 'package:myapp/utils/constants.dart';
+import 'package:myapp/utils/my_buttons.dart';
 
 class GreenhousePage extends ConsumerStatefulWidget {
   const GreenhousePage({super.key});
@@ -31,7 +32,7 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
   Future<void> _fetchVarietyData() async {
     final apiService = ref.read(apiServiceProvider);
     try {
-      final data = await apiService.getVarietyData();
+      final data = await apiService.getSecondAcclimatizationData();
       setState(() {
         _varietyData = data;
         _isLoading = false;
@@ -65,14 +66,14 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
               Navigator.pop(context);
             },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {
-                // Implement menu action
-              },
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.menu, color: Colors.white),
+          //     onPressed: () {
+          //       // Implement menu action
+          //     },
+          //   ),
+          // ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -149,7 +150,86 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
                         itemCount: _varietyData.length,
                         itemBuilder: (context, index) {
                           final variety = _varietyData[index];
-                          return _buildVarietyCard(variety);
+                          return Card(
+                            color: const Color(0XFF2E2E2E),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Variety:  ${variety['variety']['variety_name']}',
+                                        style: const TextStyle(
+                                            color: Color(0xFFD19806),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Product Sans Regular"),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Quantity: ${variety['quantity']}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: "Product Sans Regular"),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Mortality:    ${variety['mortality']}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: "Product Sans Regular"),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Arrival Date: ${variety['variety']['created_at'] != null ? variety['variety']['created_at'].split("T").first : 'N/A'}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: "Product Sans Regular"),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Number of Cut Done:    ${variety['cut_done'] ?? 0}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: "Product Sans Regular"),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Created By: ${variety['created_by']}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: "Product Sans Regular"),
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  MyButton(
+                                      onTap: () {
+                                        // Navigate to the First Cut Page with the variety data
+                                        Navigator.pushNamed(
+                                            context, '/firstCut',
+                                            );
+                                      },
+                                      text: "Make a cut")
+// put the button here to  make a cut here
+                                ],
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -159,106 +239,106 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
         bottomNavigationBar: _buildBottomNavbar());
   }
 
-  Widget _buildVarietyCard(Map<String, dynamic> variety) {
-    return Card(
-      color: const Color(0XFF2E2E2E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Variety:  ${variety['variety_name']}',
-                  style: const TextStyle(
-                      color: Color(0xFFD19806),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Product Sans Regular"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Quantity:               ${variety['quantity']}',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontFamily: "Product Sans Regular"),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Mortality:               ${variety['mortality']}',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontFamily: "Product Sans Regular"),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Arrival Date:          ${variety['created_at'].split("T").first}',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontFamily: "Product Sans Regular"),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Number of Cut Done:    ${variety['cut_done'] ?? 0}',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontFamily: "Product Sans Regular"),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Created By:      ${variety['created_by']}',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontFamily: "Product Sans Regular"),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 100,
-              height: 30,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Navigate to the First Cut Page with the variety data
-                  Navigator.pushNamed(
-                    context,
-                    '/firstCut',
-                    arguments: {
-                      'name': variety['variety_name'], // Pass the variety name
-                      'quantity': variety['quantity'], // Pass the quantity
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-                child: Text(
-                  "Make a Cut",
-                  style: AppConstants.subtitleTextStyle.copyWith(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildVarietyCard(Map<String, dynamic> variety) {
+  //   return Card(
+  //     color = const Color(0XFF2E2E2E),
+  //     shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  //     margin = const EdgeInsets.symmetric(vertical: 8),
+  //     child = Padding(
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               Text(
+  //                 'Variety:  ${variety['variety_name']}',
+  //                 style: const TextStyle(
+  //                     color: Color(0xFFD19806),
+  //                     fontSize: 14,
+  //                     fontWeight: FontWeight.bold,
+  //                     fontFamily: "Product Sans Regular"),
+  //               ),
+  //             ],
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             'Quantity: ${variety['quantity']}',
+  //             style: const TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 13,
+  //                 fontFamily: "Product Sans Regular"),
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             'Mortality:    ${variety['mortality']}',
+  //             style: const TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 13,
+  //                 fontFamily: "Product Sans Regular"),
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             'Arrival Date: ${variety['created_at'].split("T").first}',
+  //             style: const TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 13,
+  //                 fontFamily: "Product Sans Regular"),
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             'Number of Cut Done:    ${variety['cut_done'] ?? 0}',
+  //             style: const TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 13,
+  //                 fontFamily: "Product Sans Regular"),
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             'Created By: ${variety['created_by']}',
+  //             style: const TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 13,
+  //                 fontFamily: "Product Sans Regular"),
+  //           ),
+  //           const SizedBox(height: 10),
+  //           SizedBox(
+  //             width: 100,
+  //             height: 30,
+  //             child: ElevatedButton(
+  //               onPressed: () {
+  //                 // Navigate to the First Cut Page with the variety data
+  //                 Navigator.pushNamed(
+  //                   context,
+  //                   '/firstCut',
+  //                   arguments: {
+  //                     'name': variety['variety_name'], // Pass the variety name
+  //                     'quantity': variety['quantity'], // Pass the quantity
+  //                   },
+  //                 );
+  //               },
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: Colors.green,
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(50),
+  //                 ),
+  //               ),
+  //               child: Text(
+  //                 "Make a Cut",
+  //                 style: AppConstants.subtitleTextStyle.copyWith(
+  //                   color: Colors.white,
+  //                   fontSize: 10,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //             ),
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   BottomNavigationBar _buildBottomNavbar() {
     return BottomNavigationBar(
@@ -273,11 +353,11 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
         ),
         BottomNavigationBarItem(
           icon: Icon(size: 14, Icons.batch_prediction),
-          label: 'All Varieties',
+          label: 'GreenHouse',
         ),
         BottomNavigationBarItem(
           icon: Icon(size: 14, Icons.data_exploration),
-          label: 'Forecast',
+          label: 'Prduction',
         ),
         BottomNavigationBarItem(
           icon: Icon(
@@ -287,11 +367,11 @@ class _GreenhousePageState extends ConsumerState<GreenhousePage> {
           label: 'Report',
         ),
       ],
-      currentIndex: _selectedIndex,
+      // currentIndex: _selectedIndex,
       selectedItemColor: Colors.green,
       unselectedItemColor: Colors.white,
       backgroundColor: const Color.fromARGB(255, 33, 29, 29),
-      onTap: _onItemTapped,
+      // onTap: _onItemTapped,
     );
   }
 }
