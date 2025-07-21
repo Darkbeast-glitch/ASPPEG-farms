@@ -36,7 +36,7 @@ class DatePickerForm extends StatelessWidget {
         if (pickedDate != null) {
           dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
         }
-      },
+            },
     );
   }
 }

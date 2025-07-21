@@ -50,8 +50,8 @@ class AuthService {
       // Print the Firebase ID token to the console
       await printFirebaseToken();
 
-      // Navigate to the home page
-      Navigator.of(context).pushReplacementNamed('/home');
+      // Navigate to batch selection page first before home
+      Navigator.of(context).pushReplacementNamed('/batchSelect');
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       // Handle errors

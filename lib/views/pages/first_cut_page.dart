@@ -516,7 +516,7 @@ Future<void> _handleCutSubmission() async {
             _weekController.text = _calculateWeek(pickedDate);
           });
         }
-      },
+            },
     );
   }
 

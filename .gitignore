@@ -1,43 +1,73 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
+# Environment and secrets
+.env
+.env.*
+*.env.dart
+*.secrets
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# iOS specific
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/*.mode1v3
+**/ios/*.mode2v3
+**/ios/*.moved-aside
+**/ios/*.pbxuser
+**/ios/*.perspectivev3
+**/ios/**/*sync/
+**/ios/Profile/
+**/ios/xcuserdata/
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
+# Android specific
+**/android/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+
+# Coverage
+coverage/
+*.lcov
+
+# Mason/bricks
+.mason/
+
+# FVM
+.fvm/flutter_sdk
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Test related
+.test_coverage.dart
+.test_runner.dart
+
+
+build/
+**/build/
 .flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
 
-# Symbolication related
-app.*.symbols
+# macOS specific
+.DS_Store
 
-# Obfuscation related
-app.*.map.json
+# Xcode
+DerivedData/
+*.xcworkspace
+*.xcuserstate
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+
+.dart_tool/
+.flutter-plugins-dependencies
+.idea/
+build/
+myapp.iml

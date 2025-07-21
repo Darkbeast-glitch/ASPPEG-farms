@@ -13,7 +13,7 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   final AuthService authService;
   // static const String baseUrl = 'https://sweetpotato-backend.onrender.com';
-  static const String baseUrl = 'https://ddb1-102-211-52-228.ngrok-free.app';
+  static const String baseUrl = 'https://a9c0b67bc47a.ngrok-free.app';
 
   ApiService(this.authService);
 

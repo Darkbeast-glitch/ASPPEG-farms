@@ -31,34 +31,37 @@ class OnboardingPage extends ConsumerWidget {
     bool isLoggedIn = false;
 
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Background image with a darker overlay
-            ColorFiltered(
+      body: Stack(
+        children: [
+          // Background image with a darker overlay - positioned outside SafeArea
+          Positioned.fill(
+            child: ColorFiltered(
               colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.5),
+                Colors.black.withValues(alpha: 0.5),
                 BlendMode.darken,
               ),
               child: Image.asset(
                 'assets/images/backImage.jpg',
                 fit: BoxFit.cover,
-                height: double.infinity,
-                width: double.infinity,
-                alignment: Alignment.topCenter,
-                // Fix upside down image by forcing no rotation
-                // and flipping if needed
-                // If still upside down, use Transform
+                alignment: Alignment.center,
               ),
             ),
+          ),
 
-            // Blur effect
-            BackdropFilter(
+          // Blur effect covering the entire screen
+          Positioned.fill(
+            child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
               child: Container(
-                color: Colors.black.withOpacity(0),
+                color: Colors.black.withValues(alpha: 0.0),
               ),
             ),
+          ),
+
+          // Content within SafeArea
+          SafeArea(
+            child: Stack(
+              children: [
 
             // Welcome and Skip row
             // const Padding(
@@ -202,8 +205,10 @@ class OnboardingPage extends ConsumerWidget {
                 ],
               ),
             ),
-          ],
-        ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

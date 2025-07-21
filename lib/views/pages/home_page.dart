@@ -36,7 +36,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Navigate to different pages based on bottom nav index
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, "/home");
+        // Already on home, no need to navigate
         break;
       case 1:
         Navigator.pushNamed(context, "/greenHouse");
@@ -45,10 +45,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         Navigator.pushNamed(context, "/forecast");
         break;
       case 3:
-        Navigator.pushNamed(context, "/settings");
-        break;
-      case 4:
-        Navigator.pushNamed(context, "/report");
+        Navigator.pushNamed(context, "/reportPage");
         break;
     }
   }
@@ -67,11 +64,21 @@ class _HomePageState extends ConsumerState<HomePage> {
     final selectedBatch = ref.watch(selectedBatchProvider);
     final userAuthProvider = ref.read(authServiceProvider);
 
+    // Check if user has selected a batch, if not redirect to batch selection
+    if (selectedBatch == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/batchSelect');
+      });
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     // Temporary hardcoded values
     // const userName = 'Julius';
     const userEmail = 'bbjulius900@gmail.com';
-    const plantsInGreenhouse = 2000;
-    const cutsDue = 10000;
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 33, 29, 29),
@@ -174,9 +181,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       top: 50,
                       left: 120,
                       child: Text(
-                          selectedBatch != null
-                              ? 'Current Batch: $selectedBatch'
-                              : 'No Batch Selected',
+                          'Current Batch: $selectedBatch',
                           style: AppConstants.subtitleTextStyle.copyWith(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -367,7 +372,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(size: 14, Icons.batch_prediction),
+          icon: Icon(size: 14, Icons.house),
           label: 'GreenHouse',
         ),
         BottomNavigationBarItem(
@@ -381,7 +386,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           label: 'Report',
         ),
-        
       ],
       currentIndex: _selectedIndex,
       selectedItemColor: Colors.green,

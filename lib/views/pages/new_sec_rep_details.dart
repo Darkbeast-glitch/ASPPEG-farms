@@ -458,7 +458,7 @@ Future<void> _handleSecondCutSubmission() async {
             controller.text = pickedDate.toIso8601String().split('T').first;
           });
         }
-      },
+            },
     );
   }
 
