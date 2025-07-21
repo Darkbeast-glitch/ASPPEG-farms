@@ -1,13 +1,68 @@
-gradle-wrapper.jar
-/.gradle
-/captures/
-/gradlew
-/gradlew.bat
-/local.properties
-GeneratedPluginRegistrant.java
+# Environment and secrets
+.env
+.env.*
+*.env.dart
+*.secrets
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
-key.properties
-**/*.keystore
-**/*.jks
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# iOS specific
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/*.mode1v3
+**/ios/*.mode2v3
+**/ios/*.moved-aside
+**/ios/*.pbxuser
+**/ios/*.perspectivev3
+**/ios/**/*sync/
+**/ios/Profile/
+**/ios/xcuserdata/
+
+# Android specific
+**/android/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+
+# Coverage
+coverage/
+*.lcov
+
+# Mason/bricks
+.mason/
+
+# FVM
+.fvm/flutter_sdk
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Test related
+.test_coverage.dart
+.test_runner.dart
+
+
+
+# Flutter build output
+build/
+**/build/
+.flutter-plugins-dependencies
+
+# macOS specific
+.DS_Store
+
+# Xcode
+DerivedData/
+*.xcworkspace
+*.xcuserstate

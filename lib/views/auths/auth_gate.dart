@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/views/auths/login_or_register.dart';
 import 'package:myapp/views/auths/login_page.dart';
 import 'package:myapp/views/pages/batch_select.dart';
 import 'package:myapp/views/pages/onboarding_page.dart';

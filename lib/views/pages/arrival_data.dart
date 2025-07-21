@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gap/gap.dart';
 import 'package:myapp/providers/medium_buttons.dart';
+import 'package:myapp/providers/select_batch_prvoider.dart';
 import 'package:myapp/services/api_services.dart'; // Import your API service
 import 'package:myapp/utils/arrival_text_Form.dart';
 import 'package:myapp/utils/constants.dart';
@@ -35,13 +36,29 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
 
   // Function to pick an image from the gallery
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    } else {
-      print('No image selected.');
+    try {
+      final pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting image: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error picking image: $e');
     }
   }
 
@@ -58,23 +75,26 @@ class _ArrivalDataPageState extends ConsumerState<ArrivalDataPage> {
     String? imagePath;
     if (_selectedImage != null) {
       imagePath = await apiService.uploadImage(_selectedImage!);
-      if (imagePath == null) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Image upload failed. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
     }
 
     // Step 2: Prepare arrival data and submit to the backend
+    final selectedBatchId = ref.read(selectedBatchIdProvider);
+    
+    if (selectedBatchId == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No batch selected. Please select a batch first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
     Map<String, dynamic> arrivalData = {
-      "batch_id": 1, // Replace with the actual batch ID or get it dynamically
+      "batch_id": 1, // Use the actual selected batch ID
       "quantity_of_plant_arrived": int.tryParse(quantityController.text) ?? 0,
       "date_of_arrival": dateController.text,
       "mortality_rate": int.tryParse(mortalityController.text) ?? 0,

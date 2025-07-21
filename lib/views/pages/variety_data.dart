@@ -146,8 +146,12 @@ class _VarietyDetailsPageState extends ConsumerState<VarietyDetailsPage> {
     try {
       final apiService = ref.read(apiServiceProvider);
       final authService = ref.read(authServiceProvider);
-      final firebaseUID = await authService.getIdToken();
-      final fullName = await apiService.fetchUserFullName(firebaseUID!);
+      final currentUser = authService.getCurrentUser();
+      if (currentUser == null) {
+        throw Exception('No user is currently signed in');
+      }
+      final firebaseUID = currentUser.uid;
+      final fullName = await apiService.fetchUserFullName(firebaseUID);
 
       for (var form in _varietyForms) {
         String? imageUrl;

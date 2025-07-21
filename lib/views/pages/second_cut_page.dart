@@ -508,7 +508,7 @@ FadeInUp(
             _weekController.text = _calculateWeek(pickedDate);
           });
         }
-      },
+            },
     );
   }
 
